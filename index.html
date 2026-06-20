@@ -93,7 +93,7 @@ input { font: inherit; }
 }
 
 /* ============ LAYOUT ============ */
-.app { display: flex; flex-direction: column; min-height: 100vh; }
+.app { display: flex; flex-direction: column; min-height: 100vh; overflow-x: hidden; }
 .container { width: 100%; max-width: 1280px; margin: 0 auto; padding: 0 12px; }
 @media (min-width: 768px) { .container { padding: 0 24px; } }
 
@@ -134,16 +134,17 @@ input { font: inherit; }
 .live-dot::after { animation: ping 1.5s cubic-bezier(0,0,.2,1) infinite; opacity: 0.6; }
 @keyframes ping { 0% { transform: scale(1); opacity: 0.6; } 75%, 100% { transform: scale(2.5); opacity: 0; } }
 
-.nav { display: none; margin-left: 8px; align-items: center; gap: 2px; }
+.nav { display: none; margin-left: 8px; align-items: center; gap: 2px; overflow-x: auto; max-width: 100%; scrollbar-width: none; }
+.nav::-webkit-scrollbar { display: none; }
 @media (min-width: 1024px) { .nav { display: flex; } }
-.nav-item { padding: 8px 12px; font-size: 14px; font-weight: 500; color: var(--fg-2); border-radius: 8px; transition: color .2s, background .2s; position: relative; }
+.nav-item { padding: 8px 12px; font-size: 14px; font-weight: 500; color: var(--fg-2); border-radius: 8px; transition: color .2s, background .2s; position: relative; flex-shrink: 0; }
 .nav-item:hover { color: var(--fg); }
 .nav-item.active { color: var(--fg); }
 .nav-item.active::after { content: ''; position: absolute; left: 12px; right: 12px; bottom: 2px; height: 2px; background: var(--brand); border-radius: 2px; }
 .nav-item .count { font-size: 10px; color: var(--fg-3); margin-left: 3px; font-variant-numeric: tabular-nums; }
 
-.search-trigger { display: none; margin-left: auto; align-items: center; gap: 8px; height: 36px; padding: 0 12px; background: var(--bg-3); border: 1px solid var(--border); border-radius: 8px; font-size: 13px; color: var(--fg-2); cursor: pointer; transition: background .2s; min-width: 220px; }
-@media (min-width: 1024px) { .search-trigger { display: inline-flex; } }
+.search-trigger { display: none; margin-left: auto; align-items: center; gap: 8px; height: 36px; padding: 0 12px; background: var(--bg-3); border: 1px solid var(--border); border-radius: 8px; font-size: 13px; color: var(--fg-2); cursor: pointer; transition: background .2s; min-width: 180px; flex-shrink: 0; }
+@media (min-width: 1280px) { .search-trigger { display: inline-flex; } }
 .search-trigger:hover { background: var(--border); }
 .kbd { margin-left: auto; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; padding: 2px 6px; background: var(--bg-2); border: 1px solid var(--border); border-radius: 4px; color: var(--fg-3); }
 
@@ -499,8 +500,41 @@ main { flex: 1; padding: 24px 0 48px; }
 /* ============ POPOVER (Source Filter) ============ */
 .popover-backdrop { position: fixed; inset: 0; z-index: 80; display: none; }
 .popover-backdrop.open { display: block; }
-.popover { position: absolute; z-index: 85; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-lg); padding: 12px; min-width: 280px; display: none; }
+.popover { position: fixed; z-index: 85; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-lg); padding: 12px; min-width: 280px; max-width: calc(100vw - 24px); display: none; }
 .popover.open { display: block; }
+/* On mobile: position as bottom sheet, fixed to viewport */
+@media (max-width: 767px) {
+  .popover {
+    position: fixed;
+    bottom: 0;
+    bottom: env(safe-area-inset-bottom, 0);
+    left: 0;
+    right: 0;
+    top: auto;
+    width: 100%;
+    max-width: none;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    max-height: 75vh;
+    overflow-y: auto;
+    animation: popoverSlideUp .25s ease-out;
+    padding: 16px 16px calc(16px + env(safe-area-inset-bottom, 0));
+  }
+  .popover.open { display: block; }
+  /* Add a drag handle visual at top */
+  .popover::before {
+    content: '';
+    display: block;
+    width: 36px;
+    height: 4px;
+    background: var(--border-2);
+    border-radius: 2px;
+    margin: 0 auto 12px;
+  }
+}
+@keyframes popoverSlideUp {
+  from { transform: translateY(100%); opacity: 0.5; }
+  to { transform: translateY(0); opacity: 1; }
+}
 .popover-title { font-size: 13px; font-weight: 700; margin-bottom: 8px; padding: 0 8px; display: flex; align-items: center; }
 .popover-title .reset { margin-left: auto; font-size: 11px; color: var(--fg-3); cursor: pointer; }
 .popover-title .reset:hover { color: var(--brand); }
@@ -2323,8 +2357,24 @@ function setupEvents() {
     const back = document.getElementById('popover-backdrop');
     // Close source popover if open
     document.getElementById('source-popover').classList.remove('open');
+    // Move popover to body so it's not affected by sticky header containing block
+    if (pop.parentElement !== document.body) {
+      document.body.appendChild(pop);
+    }
     pop.classList.toggle('open');
     back.classList.toggle('open');
+    // Position on desktop (mobile uses bottom sheet via CSS)
+    if (window.innerWidth >= 768) {
+      const btn = document.getElementById('theme-toggle');
+      const r = btn.getBoundingClientRect();
+      pop.style.top = (r.bottom + 8) + 'px';
+      pop.style.right = (window.innerWidth - r.right) + 'px';
+      pop.style.left = 'auto';
+    } else {
+      pop.style.top = '';
+      pop.style.right = '';
+      pop.style.left = '';
+    }
     // Update active state
     pop.querySelectorAll('.theme-option').forEach(opt => {
       opt.classList.toggle('active', opt.dataset.theme === state.theme);
@@ -2383,8 +2433,24 @@ function setupEvents() {
     const back = document.getElementById('popover-backdrop');
     // Close theme popover if open
     document.getElementById('theme-popover').classList.remove('open');
+    // Move popover to body so it's not affected by any parent positioning
+    if (pop.parentElement !== document.body) {
+      document.body.appendChild(pop);
+    }
     pop.classList.toggle('open');
     back.classList.toggle('open');
+    // Position on desktop (mobile uses bottom sheet via CSS)
+    if (window.innerWidth >= 768) {
+      const btn = document.getElementById('source-filter-btn');
+      const r = btn.getBoundingClientRect();
+      pop.style.top = (r.bottom + 8) + 'px';
+      pop.style.right = (window.innerWidth - r.right) + 'px';
+      pop.style.left = 'auto';
+    } else {
+      pop.style.top = '';
+      pop.style.right = '';
+      pop.style.left = '';
+    }
   };
   document.getElementById('popover-backdrop').onclick = () => {
     document.getElementById('source-popover').classList.remove('open');
