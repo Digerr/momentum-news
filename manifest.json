@@ -1,0 +1,19 @@
+{
+  "name": "MOMENTUM — Новости в движении",
+  "short_name": "MOMENTUM",
+  "description": "Современный новостной портал с реальными новостями из 9 источников",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#fafafa",
+  "theme_color": "#ff5a1f",
+  "orientation": "portrait",
+  "lang": "ru",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

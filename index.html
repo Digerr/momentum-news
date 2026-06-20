@@ -4,10 +4,27 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#ff5a1f">
-<meta name="description" content="MOMENTUM — современный новостной портал с реальными новостями из 6 источников. Закладки, поиск, тёмная тема, Command Palette.">
+<meta name="description" content="MOMENTUM — современный новостной портал с реальными новостями из 9 источников: Lenta, ТАСС, РИА, Interfax, Коммерсантъ, Хабр, Ведомости, RT, Stopgame. Закладки, поиск, темы оформления, AI-конспект.">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="MOMENTUM">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="apple-touch-icon" href="favicon.svg">
+<link rel="manifest" href="manifest.json">
+
+<!-- Open Graph for Telegram/Twitter/Facebook sharing -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="MOMENTUM">
+<meta property="og:title" content="MOMENTUM — Новости в движении">
+<meta property="og:description" content="Свежие новости из 9 источников: Lenta, ТАСС, РИА, Interfax, Коммерсантъ, Хабр, Ведомости, RT, Stopgame. Полный текст статей, закладки, поиск, 4 темы оформления.">
+<meta property="og:url" content="https://digerr.github.io/momentum-news/">
+<meta property="og:image" content="https://digerr.github.io/momentum-news/og-image.svg">
+<meta property="og:locale" content="ru_RU">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="MOMENTUM — Новости в движении">
+<meta name="twitter:description" content="Свежие новости из 9 источников в реальном времени">
+<meta name="twitter:image" content="https://digerr.github.io/momentum-news/og-image.svg">
+
 <title>MOMENTUM — Новости в движении</title>
 <style>
 /* ============ RESET ============ */
@@ -135,8 +152,8 @@ input { font: inherit; }
 /* ============ HEADER ============ */
 .header { position: sticky; top: 0; z-index: 50; background: rgba(250, 250, 250, 0.85); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid var(--border); padding-top: env(safe-area-inset-top); padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
 [data-theme="dark"] .header { background: rgba(10, 10, 11, 0.85); }
-.header .container { display: flex; align-items: center; gap: 8px; height: 56px; }
-@media (min-width: 768px) { .header .container { gap: 18px; height: 72px; } }
+.header .container { display: flex; align-items: center; gap: 6px; height: 56px; }
+@media (min-width: 768px) { .header .container { gap: 8px; height: 72px; } }
 
 .logo { display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0; }
 @media (min-width: 768px) { .logo { gap: 8px; } }
@@ -528,6 +545,32 @@ main { flex: 1; padding: 24px 0 48px; }
 .modal-source-cta svg { width: 16px; height: 16px; color: var(--fg-3); }
 .modal-actions { margin-top: 20px; display: flex; flex-wrap: wrap; gap: 8px; }
 
+/* Related articles in modal */
+.modal-related { margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--border); }
+.modal-related-title { font-family: 'Playfair Display', Georgia, serif; font-size: 18px; font-weight: 800; letter-spacing: -0.015em; margin-bottom: 14px; }
+.modal-related-list { display: grid; grid-template-columns: 1fr; gap: 10px; }
+@media (min-width: 640px) { .modal-related-list { grid-template-columns: 1fr 1fr; } }
+.modal-related-item { display: flex; gap: 10px; padding: 10px; border-radius: 8px; cursor: pointer; transition: background .15s; border: 1px solid transparent; --cat-color: var(--brand); border-left: 3px solid var(--cat-color); }
+.modal-related-item[data-cat="Игры"] { --cat-color: var(--cat-games); }
+.modal-related-item[data-cat="Спорт"] { --cat-color: var(--cat-sport); }
+.modal-related-item[data-cat="Технологии"] { --cat-color: var(--cat-tech); }
+.modal-related-item[data-cat="Бизнес"] { --cat-color: var(--cat-business); }
+.modal-related-item[data-cat="Наука"] { --cat-color: var(--cat-science); }
+.modal-related-item[data-cat="Культура"] { --cat-color: var(--cat-culture); }
+.modal-related-item[data-cat="Мир"] { --cat-color: var(--cat-world); }
+.modal-related-item[data-cat="Общество"] { --cat-color: var(--cat-society); }
+.modal-related-item[data-cat="Происшествия"] { --cat-color: var(--cat-incidents); }
+.modal-related-item:hover { background: var(--bg-3); }
+.modal-related-item img:not(.modal-related-img-placeholder img):not(.modal-related-source img) { width: 72px; height: 72px; border-radius: 6px; object-fit: cover; flex-shrink: 0; background: var(--bg-3); }
+.modal-related-img-placeholder { width: 72px; height: 72px; border-radius: 6px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--cat-color) 0%, color-mix(in srgb, var(--cat-color) 60%, var(--bg-3)) 100%); }
+.modal-related-img-placeholder img { width: 24px; height: 24px; border-radius: 5px; background: rgba(255,255,255,0.95); padding: 4px; }
+.modal-related-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.modal-related-source { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--fg-2); font-weight: 600; margin-bottom: 4px; }
+.modal-related-source img { width: 12px; height: 12px; border-radius: 2px; }
+.modal-related-h { font-size: 13px; font-weight: 600; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 4px; }
+.modal-related-item:hover .modal-related-h { color: var(--cat-color); }
+.modal-related-meta { margin-top: auto; font-size: 10px; color: var(--fg-3); display: flex; gap: 8px; }
+
 /* ============ DRAWER (Bookmarks) ============ */
 .drawer-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 90; opacity: 0; pointer-events: none; transition: opacity .25s; }
 .drawer-backdrop.open { opacity: 1; pointer-events: auto; }
@@ -815,10 +858,23 @@ body.in-telegram .footer { display: none; }
   <!-- MAIN -->
   <main>
     <div class="container">
-      <!-- LOADING -->
-      <div id="loading" style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding: 96px 0; gap:16px; color: var(--fg-2);">
-        <div style="width:48px; height:48px; border:3px solid var(--border); border-top-color: var(--brand); border-radius:50%; animation: spin 0.8s linear infinite;"></div>
-        <p id="loading-text">Загружаем свежие новости из 6 источников…</p>
+      <!-- LOADING (skeleton) -->
+      <div id="loading">
+        <!-- Hero skeleton -->
+        <div style="display: grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: 40px; margin-top: 24px;">
+          <div class="skeleton" style="aspect-ratio: 16/10; border-radius: 12px;"></div>
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <div class="skeleton" style="height: 80px; border-radius: 8px;"></div>
+            <div class="skeleton" style="height: 80px; border-radius: 8px;"></div>
+          </div>
+        </div>
+        <!-- Grid skeleton -->
+        <div style="column-count: 1; column-gap: 20px;">
+          <div class="skeleton" style="aspect-ratio: 16/10; border-radius: 8px; margin-bottom: 20px;"></div>
+          <div class="skeleton" style="aspect-ratio: 16/10; border-radius: 8px; margin-bottom: 20px;"></div>
+          <div class="skeleton" style="aspect-ratio: 16/10; border-radius: 8px; margin-bottom: 20px;"></div>
+        </div>
+        <p id="loading-text" style="text-align: center; padding: 24px 0; color: var(--fg-3); font-size: 14px;">Загружаем свежие новости из 9 источников…</p>
       </div>
 
       <!-- ERROR -->
@@ -1294,9 +1350,6 @@ function calcReadingTime(text) {
   const w = (text || '').trim().split(/\s+/).length;
   return Math.max(1, Math.round(w / 200));
 }
-function fallbackImg(seed) {
-  return 'https://picsum.photos/seed/' + encodeURIComponent(seed).slice(0, 40) + '/600/400';
-}
 function escapeHtml(s) {
   return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
 }
@@ -1558,7 +1611,7 @@ function getDemoArticles() {
     author: ['Анна Соколова','Дмитрий Орлов','Мария Кузнецова','Игорь Петров','Елена Васильева','Сергей Морозов'][i % 6],
     publishedAt: mins(time),
     readingTime: Math.max(1, Math.round((content || excerpt).split(/\s+/).length / 200)),
-    image: 'https://picsum.photos/seed/demo' + i + '/600/400',
+    image: '', // empty = show gradient placeholder with source favicon
     link: SOURCES[srcIdx].url,
     source: SOURCES[srcIdx],
     views: 50000 - i * 3000 + Math.floor(Math.random() * 5000),
@@ -2376,6 +2429,7 @@ function openArticle(id) {
           AI
         </button>
       </div>
+      <div class="modal-related" id="modal-related"></div>
     </div>
   `;
   document.getElementById('modal-backdrop').classList.add('open');
@@ -2388,6 +2442,9 @@ function openArticle(id) {
   };
   document.getElementById('modal-share-btn').onclick = () => shareArticle(a);
   document.getElementById('modal-ai-btn').onclick = () => generateAISummary(a);
+
+  // Render related articles (same category, exclude current)
+  renderRelatedArticles(a);
 
   // Reading progress
   const scroll = document.getElementById('modal-scroll');
@@ -2446,6 +2503,57 @@ function closeModal() {
   document.getElementById('modal-backdrop').classList.remove('open');
   document.body.style.overflow = '';
   state.currentArticle = null;
+}
+
+// Render related articles in modal — same category first, then by title similarity
+function renderRelatedArticles(currentArticle) {
+  const container = document.getElementById('modal-related');
+  if (!container) return;
+  // Find related: same category, exclude current, exclude those already in hero
+  const { featured, secondary } = getHeroArticles();
+  const excludeIds = new Set([currentArticle.id, featured?.id, ...secondary.map(a => a.id)]);
+  // Same category, sorted by date (most recent first), take 4
+  let related = state.articles
+    .filter(a => !excludeIds.has(a.id) && a.category === currentArticle.category)
+    .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
+    .slice(0, 4);
+  // If less than 4 in same category, fill with articles from other categories (similar title)
+  if (related.length < 4) {
+    const fillCount = 4 - related.length;
+    const fillers = state.articles
+      .filter(a => !excludeIds.has(a.id) && a.id !== currentArticle.id && !related.includes(a) && a.category !== currentArticle.category)
+      .map(a => ({ a, sim: titleSimilarity(a.title, currentArticle.title) }))
+      .filter(x => x.sim > 0.15)
+      .sort((a, b) => b.sim - a.sim)
+      .slice(0, fillCount)
+      .map(x => x.a);
+    related = related.concat(fillers);
+  }
+  if (related.length === 0) {
+    container.innerHTML = '';
+    return;
+  }
+  container.innerHTML = `
+    <div class="modal-related-title">Читайте также</div>
+    <div class="modal-related-list">
+      ${related.map(a => `
+        <div class="modal-related-item" data-cat="${escapeHtml(a.category)}" onclick="openArticle('${a.id}')">
+          ${a.image
+            ? `<img src="${escapeHtml(a.image)}" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+               <div class="modal-related-img-placeholder" style="display:none;"><img src="${a.source.favicon}" alt=""></div>`
+            : `<div class="modal-related-img-placeholder"><img src="${a.source.favicon}" alt=""></div>`}
+          <div class="modal-related-body">
+            <div class="modal-related-source"><img src="${a.source.favicon}" alt="">${a.source.name}</div>
+            <h4 class="modal-related-h">${escapeHtml(a.title)}</h4>
+            <div class="modal-related-meta">
+              <span style="color: var(--cat-color, var(--brand)); font-weight: 600;">${escapeHtml(a.category)}</span>
+              <span>🕒 ${timeAgo(a.publishedAt)}</span>
+            </div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
 }
 
 async function shareArticle(a) {
@@ -2587,10 +2695,15 @@ function execCmdK(idx) {
 
 // ---------- LOAD ALL ----------
 async function loadAll(force) {
-  document.getElementById('loading').style.display = 'flex';
+  document.getElementById('loading').style.display = 'block';
   document.getElementById('loading-text').textContent = t('loading');
   document.getElementById('error').style.display = 'none';
   document.getElementById('content').style.display = 'none';
+
+  // Check if offline
+  if (!navigator.onLine) {
+    toast('Вы офлайн. Показаны последние сохранённые статьи.', 'error');
+  }
 
   try {
     const [articles, weather, currency] = await Promise.all([
@@ -2755,11 +2868,25 @@ function setupEvents() {
     document.getElementById('popover-backdrop').classList.remove('open');
   };
 
-  // Load more
+  // Load more (button click — fallback for infinite scroll)
   document.getElementById('load-more-btn').onclick = () => {
     state.visible += 9;
     renderGrid();
   };
+
+  // Infinite scroll via IntersectionObserver
+  const infiniteScrollSentinel = document.getElementById('load-more-wrap');
+  if (infiniteScrollSentinel && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && state.visible < state.filtered.length) {
+          state.visible += 9;
+          renderGrid();
+        }
+      });
+    }, { rootMargin: '200px' });
+    io.observe(infiniteScrollSentinel);
+  }
 
   // Newsletter
   document.getElementById('newsletter-form').onsubmit = (e) => {
@@ -2833,10 +2960,10 @@ function registerSW() {
   if (!('serviceWorker' in navigator)) return;
   if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') return;
 
-  // Inline SW source
+  // Inline SW source — offline-first for static assets, network-first for RSS/API
   const swCode = `
-    const CACHE = 'momentum-v1';
-    const ASSETS = ['./'];
+    const CACHE = 'momentum-v2';
+    const ASSETS = ['./', './momentum.html', './index.html', './favicon.svg', './manifest.json'];
     self.addEventListener('install', e => {
       self.skipWaiting();
       e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS).catch(() => {})));
@@ -2849,17 +2976,43 @@ function registerSW() {
       const req = e.request;
       if (req.method !== 'GET') return;
       const url = new URL(req.url);
-      // Never cache API/RSS — always fresh
-      if (url.hostname.includes('allorigins') || url.hostname.includes('open-meteo') || url.hostname.includes('cbr-xml')) {
+
+      // Never intercept RSS/API/weather/currency — always go to network
+      if (url.hostname.includes('allorigins') || url.hostname.includes('open-meteo') || url.hostname.includes('cbr-xml') || url.hostname.includes('corsproxy')) {
         return;
       }
-      // Same-origin: network-first, fallback to cache
+
+      // Same-origin static assets: cache-first (fast offline load)
       if (url.origin === self.location.origin) {
-        e.respondWith(fetch(req).then(res => {
-          const copy = res.clone();
-          caches.open(CACHE).then(c => c.put(req, copy)).catch(()=>{});
-          return res;
-        }).catch(() => caches.match(req).then(r => r || caches.match('./'))));
+        e.respondWith(
+          caches.match(req).then(cached => {
+            const fetchPromise = fetch(req).then(res => {
+              const copy = res.clone();
+              caches.open(CACHE).then(c => c.put(req, copy)).catch(()=>{});
+              return res;
+            }).catch(() => cached || caches.match('./'));
+            return cached || fetchPromise;
+          })
+        );
+        return;
+      }
+
+      // Images (article images, source favicons): cache-first with fallback
+      // This allows offline viewing of previously loaded articles
+      if (req.destination === 'image' || url.hostname.includes('google.com/s2/favicons') || url.pathname.match(/\\.(jpg|jpeg|png|webp|svg|gif)$/i)) {
+        e.respondWith(
+          caches.match(req).then(cached => {
+            if (cached) return cached;
+            return fetch(req).then(res => {
+              if (res.ok) {
+                const copy = res.clone();
+                caches.open(CACHE + '-img').then(c => c.put(req, copy)).catch(()=>{});
+              }
+              return res;
+            }).catch(() => cached || new Response('', { status: 404 }));
+          })
+        );
+        return;
       }
     });
   `;
@@ -2987,6 +3140,15 @@ async function init() {
 
   // Auto-refresh every 5 minutes
   setInterval(() => loadAll(false), 5 * 60 * 1000);
+
+  // Online/offline detection
+  window.addEventListener('online', () => {
+    toast('Снова онлайн. Обновляем ленту…', 'success');
+    loadAll(false);
+  });
+  window.addEventListener('offline', () => {
+    toast('Вы офлайн. Показаны последние сохранённые статьи.', 'error');
+  });
 }
 
 document.addEventListener('DOMContentLoaded', init);

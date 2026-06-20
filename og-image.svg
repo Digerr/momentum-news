@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0a0a0b"/>
+      <stop offset="1" stop-color="#1f1f23"/>
+    </linearGradient>
+    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff5a1f"/>
+      <stop offset="1" stop-color="#ff7e3c"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.3" cy="0.5" r="0.6">
+      <stop offset="0" stop-color="#ff5a1f" stop-opacity="0.3"/>
+      <stop offset="1" stop-color="#ff5a1f" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+
+  <!-- Logo mark -->
+  <g transform="translate(80, 80)">
+    <rect width="80" height="80" rx="18" fill="url(#brand)"/>
+    <path d="M44 10 L18 50 h16 l-3 30 24-40 h-16 z" fill="#fff"/>
+  </g>
+
+  <!-- Title -->
+  <text x="80" y="320" font-family="Georgia, 'Times New Roman', serif" font-size="92" font-weight="900" fill="#ffffff" letter-spacing="-3">MOMENTUM</text>
+  <text x="80" y="400" font-family="-apple-system, 'Segoe UI', sans-serif" font-size="36" fill="#a1a1aa">Новости в движении</text>
+
+  <!-- Sources -->
+  <text x="80" y="490" font-family="-apple-system, 'Segoe UI', sans-serif" font-size="24" fill="#71717a">9 источников · 221+ статей · реальное время</text>
+
+  <!-- Category dots -->
+  <g transform="translate(80, 540)">
+    <circle cx="0" cy="0" r="8" fill="#8b5cf6"/>
+    <text x="18" y="6" font-family="-apple-system, sans-serif" font-size="18" fill="#a1a1aa">Игры</text>
+
+    <circle cx="100" cy="0" r="8" fill="#10b981"/>
+    <text x="118" y="6" font-family="-apple-system, sans-serif" font-size="18" fill="#a1a1aa">Спорт</text>
+
+    <circle cx="200" cy="0" r="8" fill="#3b82f6"/>
+    <text x="218" y="6" font-family="-apple-system, sans-serif" font-size="18" fill="#a1a1aa">Техно</text>
+
+    <circle cx="310" cy="0" r="8" fill="#f59e0b"/>
+    <text x="328" y="6" font-family="-apple-system, sans-serif" font-size="18" fill="#a1a1aa">Бизнес</text>
+
+    <circle cx="420" cy="0" r="8" fill="#06b6d4"/>
+    <text x="438" y="6" font-family="-apple-system, sans-serif" font-size="18" fill="#a1a1aa">Наука</text>
+
+    <circle cx="520" cy="0" r="8" fill="#ec4899"/>
+    <text x="538" y="6" font-family="-apple-system, sans-serif" font-size="18" fill="#a1a1aa">Культура</text>
+  </g>
+
+  <!-- Live badge -->
+  <g transform="translate(1020, 100)">
+    <rect width="100" height="36" rx="18" fill="rgba(244, 63, 94, 0.15)"/>
+    <circle cx="22" cy="18" r="4" fill="#f43f5e"/>
+    <text x="35" y="24" font-family="-apple-system, sans-serif" font-size="14" font-weight="700" fill="#f43f5e" letter-spacing="1">LIVE</text>
+  </g>
+</svg>
