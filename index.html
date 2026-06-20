@@ -1458,11 +1458,42 @@ function renderNav() {
   document.getElementById('live-count').textContent = state.articles.length;
 }
 
+// Compute hero articles based on current category/search/filter
+function getHeroArticles() {
+  // Apply same filter as applyFilter, but WITHOUT excluding featured (we'll pick from filtered)
+  const q = state.query.trim().toLowerCase();
+  const sourceSet = new Set(state.selectedSources);
+  let pool = state.articles.filter(a => {
+    if (state.activeCat !== 'Все' && a.category !== state.activeCat) return false;
+    if (sourceSet.size > 0 && !sourceSet.has(a.source.id)) return false;
+    if (q && !(a.title.toLowerCase().includes(q) || a.excerpt.toLowerCase().includes(q) || a.author.toLowerCase().includes(q) || a.source.name.toLowerCase().includes(q) || a.category.toLowerCase().includes(q))) return false;
+    return true;
+  });
+  if (pool.length === 0) return { featured: null, secondary: [], pool: [] };
+  // Featured = trending first (if any), else first article
+  let featured = pool.find(a => a.trending) || pool[0];
+  // Secondary = next 3 articles (excluding featured)
+  let secondary = pool.filter(a => a.id !== featured.id).slice(0, 3);
+  return { featured, secondary, pool };
+}
+
 function renderHero() {
-  const featured = state.articles.find(a => a.trending) || state.articles[0];
-  if (!featured) return;
-  const secondary = state.articles.filter(a => a.id !== featured.id).slice(0, 3);
-  let html = `
+  const { featured, secondary } = getHeroArticles();
+  if (!featured) {
+    document.getElementById('hero').innerHTML = '';
+    return;
+  }
+  // For non-"Все" category, show category eyebrow above hero
+  const eyebrow = state.activeCat !== 'Все'
+    ? `<div style="grid-column: 1 / -1; margin-bottom: 8px;">
+         <div class="feed-eyebrow" style="margin-bottom: 0;">
+           <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.5 4.5L18 8l-4.5 1.5L12 14l-1.5-4.5L6 8l4.5-1.5z"/></svg>
+           <span>${state.activeCat}</span>
+         </div>
+       </div>`
+    : '';
+  let html = eyebrow;
+  html += `
     <div class="hero-main" onclick="openArticle('${featured.id}')">
       <img src="${escapeHtml(featured.image)}" alt="${escapeHtml(featured.title)}" onerror="this.src='${fallbackImg(featured.id)}'">
       <div class="hero-overlay"></div>
@@ -1482,23 +1513,25 @@ function renderHero() {
       </div>
     </div>
   `;
-  html += '<div class="hero-secondary">';
-  secondary.forEach(a => {
-    html += `
-      <div class="hero-card" onclick="openArticle('${a.id}')">
-        <img class="hero-card-img" src="${escapeHtml(a.image)}" alt="" onerror="this.src='${fallbackImg(a.id)}'">
-        <div class="hero-card-body">
-          <div class="hero-card-source"><img src="${a.source.favicon}" alt="">${a.source.name}</div>
-          <h3 class="hero-card-title">${escapeHtml(a.title)}</h3>
-          <div class="hero-card-meta">
-            <span>🕒 ${timeAgo(a.publishedAt)}</span>
-            <span>👁 ${formatViews(a.views)}</span>
+  if (secondary.length > 0) {
+    html += '<div class="hero-secondary">';
+    secondary.forEach(a => {
+      html += `
+        <div class="hero-card" onclick="openArticle('${a.id}')">
+          <img class="hero-card-img" src="${escapeHtml(a.image)}" alt="" onerror="this.src='${fallbackImg(a.id)}'">
+          <div class="hero-card-body">
+            <div class="hero-card-source"><img src="${a.source.favicon}" alt="">${a.source.name}</div>
+            <h3 class="hero-card-title">${escapeHtml(a.title)}</h3>
+            <div class="hero-card-meta">
+              <span>🕒 ${timeAgo(a.publishedAt)}</span>
+              <span>👁 ${formatViews(a.views)}</span>
+            </div>
           </div>
         </div>
-      </div>
-    `;
-  });
-  html += '</div>';
+      `;
+    });
+    html += '</div>';
+  }
   document.getElementById('hero').innerHTML = html;
 }
 
@@ -1507,9 +1540,18 @@ function renderGrid() {
   const empty = document.getElementById('empty');
   const loadMoreWrap = document.getElementById('load-more-wrap');
   const list = state.filtered.slice(0, state.visible);
-  if (state.filtered.length === 0) {
+  const { featured } = getHeroArticles();
+  // Show empty state only if NO articles at all (no featured, no grid)
+  if (state.filtered.length === 0 && !featured) {
     grid.innerHTML = '';
     empty.style.display = 'block';
+    loadMoreWrap.style.display = 'none';
+    return;
+  }
+  // If we have featured/secondary but no grid items, hide grid + empty
+  if (state.filtered.length === 0) {
+    grid.innerHTML = '';
+    empty.style.display = 'none';
     loadMoreWrap.style.display = 'none';
     return;
   }
@@ -1694,16 +1736,12 @@ function renderAll() {
 
 // ---------- FILTER ----------
 function applyFilter() {
-  const q = state.query.trim().toLowerCase();
-  const sourceSet = new Set(state.selectedSources);
-  const featured = state.articles.find(a => a.trending) || state.articles[0];
-  state.filtered = state.articles.filter(a => {
-    if (a.id === featured?.id) return false;
-    if (state.activeCat !== 'Все' && a.category !== state.activeCat) return false;
-    if (sourceSet.size > 0 && !sourceSet.has(a.source.id)) return false;
-    if (q && !(a.title.toLowerCase().includes(q) || a.excerpt.toLowerCase().includes(q) || a.author.toLowerCase().includes(q) || a.source.name.toLowerCase().includes(q) || a.category.toLowerCase().includes(q))) return false;
-    return true;
-  });
+  // Use the same pool as getHeroArticles, but exclude featured + secondary from grid
+  const { featured, secondary, pool } = getHeroArticles();
+  const excludeIds = new Set();
+  if (featured) excludeIds.add(featured.id);
+  secondary.forEach(a => excludeIds.add(a.id));
+  state.filtered = pool.filter(a => !excludeIds.has(a.id));
   state.visible = 9;
 }
 
