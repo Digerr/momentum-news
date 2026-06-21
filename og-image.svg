@@ -1,25 +1,33 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#0a0a0b"/>
-      <stop offset="1" stop-color="#1f1f23"/>
+      <stop offset="0" stop-color="#0f0f12"/>
+      <stop offset="1" stop-color="#1a1a1f"/>
     </linearGradient>
-    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="bolt" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#dc2626"/>
       <stop offset="1" stop-color="#ef4444"/>
     </linearGradient>
-    <radialGradient id="glow" cx="0.3" cy="0.5" r="0.6">
+    <radialGradient id="glow" cx="0.15" cy="0.5" r="0.5">
       <stop offset="0" stop-color="#dc2626" stop-opacity="0.3"/>
       <stop offset="1" stop-color="#dc2626" stop-opacity="0"/>
     </radialGradient>
+    <filter id="glow-filter">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
   </defs>
+
   <rect width="1200" height="630" fill="url(#bg)"/>
   <rect width="1200" height="630" fill="url(#glow)"/>
 
-  <!-- Logo mark -->
-  <g transform="translate(80, 80)">
-    <rect width="80" height="80" rx="18" fill="url(#brand)"/>
-    <path d="M44 10 L18 50 h16 l-3 30 24-40 h-16 z" fill="#fff"/>
+  <!-- Logo mark (top-left, matches app icon) -->
+  <g transform="translate(80, 80)" filter="url(#glow-filter)">
+    <rect width="80" height="80" rx="18" fill="#0a0a0b"/>
+    <path d="M44 10 L18 50 h16 l-3 30 24-40 h-16 z" fill="url(#bolt)"/>
   </g>
 
   <!-- Title -->
@@ -27,7 +35,7 @@
   <text x="80" y="400" font-family="-apple-system, 'Segoe UI', sans-serif" font-size="36" fill="#a1a1aa">Новости в движении</text>
 
   <!-- Sources -->
-  <text x="80" y="490" font-family="-apple-system, 'Segoe UI', sans-serif" font-size="24" fill="#71717a">9+ источников · реальное время · полный текст статей</text>
+  <text x="80" y="490" font-family="-apple-system, 'Segoe UI', sans-serif" font-size="24" fill="#71717a">12 источников · 278+ статей · реальное время</text>
 
   <!-- Category dots -->
   <g transform="translate(80, 540)">
@@ -52,8 +60,8 @@
 
   <!-- Live badge -->
   <g transform="translate(1020, 100)">
-    <rect width="100" height="36" rx="18" fill="rgba(244, 63, 94, 0.15)"/>
-    <circle cx="22" cy="18" r="4" fill="#f43f5e"/>
-    <text x="35" y="24" font-family="-apple-system, sans-serif" font-size="14" font-weight="700" fill="#f43f5e" letter-spacing="1">LIVE</text>
+    <rect width="100" height="36" rx="18" fill="rgba(220, 38, 38, 0.15)"/>
+    <circle cx="22" cy="18" r="4" fill="#dc2626"/>
+    <text x="35" y="24" font-family="-apple-system, sans-serif" font-size="14" font-weight="700" fill="#ef4444" letter-spacing="1">LIVE</text>
   </g>
 </svg>
