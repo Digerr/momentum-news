@@ -5,12 +5,12 @@
       <stop offset="1" stop-color="#1f1f23"/>
     </linearGradient>
     <linearGradient id="brand" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#ff5a1f"/>
-      <stop offset="1" stop-color="#ff7e3c"/>
+      <stop offset="0" stop-color="#dc2626"/>
+      <stop offset="1" stop-color="#ef4444"/>
     </linearGradient>
     <radialGradient id="glow" cx="0.3" cy="0.5" r="0.6">
-      <stop offset="0" stop-color="#ff5a1f" stop-opacity="0.3"/>
-      <stop offset="1" stop-color="#ff5a1f" stop-opacity="0"/>
+      <stop offset="0" stop-color="#dc2626" stop-opacity="0.3"/>
+      <stop offset="1" stop-color="#dc2626" stop-opacity="0"/>
     </radialGradient>
   </defs>
   <rect width="1200" height="630" fill="url(#bg)"/>
@@ -27,7 +27,7 @@
   <text x="80" y="400" font-family="-apple-system, 'Segoe UI', sans-serif" font-size="36" fill="#a1a1aa">Новости в движении</text>
 
   <!-- Sources -->
-  <text x="80" y="490" font-family="-apple-system, 'Segoe UI', sans-serif" font-size="24" fill="#71717a">9 источников · 221+ статей · реальное время</text>
+  <text x="80" y="490" font-family="-apple-system, 'Segoe UI', sans-serif" font-size="24" fill="#71717a">9+ источников · реальное время · полный текст статей</text>
 
   <!-- Category dots -->
   <g transform="translate(80, 540)">
