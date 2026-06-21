@@ -8,6 +8,11 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="MOMENTUM">
+<link rel="preconnect" href="https://corsproxy.io">
+<link rel="preconnect" href="https://api.allorigins.win">
+<link rel="preconnect" href="https://api.open-meteo.com">
+<link rel="preconnect" href="https://www.cbr-xml-daily.ru">
+<link rel="dns-prefetch" href="https://www.google.com">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="256x256" href="icon-256.png">
@@ -389,6 +394,30 @@ main { flex: 1; padding: 24px 0 48px; }
 .card-text .card-meta { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border); }
 
 .load-more { margin-top: 32px; text-align: center; }
+
+/* Back to top button */
+.back-to-top { position: fixed; bottom: 20px; right: 20px; width: 44px; height: 44px; border-radius: 50%; background: var(--card); border: 1px solid var(--border); box-shadow: var(--shadow-lg); display: grid; place-items: center; cursor: pointer; z-index: 60; opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s; color: var(--fg); }
+.back-to-top.visible { opacity: 1; pointer-events: auto; }
+.back-to-top:hover { transform: translateY(-2px); border-color: var(--brand); color: var(--brand); }
+.back-to-top svg { width: 20px; height: 20px; }
+@media (max-width: 767px) { .back-to-top { bottom: 16px; right: 16px; width: 40px; height: 40px; } }
+body.in-telegram .back-to-top { bottom: calc(20px + env(safe-area-inset-bottom)); }
+
+/* "Новое" badge for fresh articles */
+.new-badge { display: inline-flex; align-items: center; gap: 3px; padding: 2px 7px; border-radius: 4px; background: var(--emerald); color: #fff; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; animation: pulse-soft 2s ease-in-out infinite; }
+@keyframes pulse-soft { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+
+/* Date filter pills */
+.date-filter { display: flex; gap: 4px; align-items: center; }
+.date-pill { padding: 4px 10px; border-radius: 999px; background: var(--bg-3); color: var(--fg-2); font-size: 11px; font-weight: 600; cursor: pointer; transition: background .15s, color .15s; border: none; white-space: nowrap; }
+.date-pill:hover { background: var(--border); }
+.date-pill.active { background: var(--fg); color: var(--bg); }
+
+/* Pull-to-refresh indicator */
+.ptr-indicator { position: fixed; top: 0; left: 50%; transform: translateX(-50%) translateY(-60px); width: 40px; height: 40px; border-radius: 50%; background: var(--card); border: 1px solid var(--border); box-shadow: var(--shadow-lg); display: grid; place-items: center; z-index: 70; transition: transform .2s ease; opacity: 0; color: var(--brand); }
+.ptr-indicator.visible { opacity: 1; }
+.ptr-indicator.spin svg { animation: spin 0.8s linear infinite; }
+.ptr-indicator svg { width: 20px; height: 20px; }
 
 .empty { padding: 64px 24px; text-align: center; color: var(--fg-2); }
 .empty h3 { font-size: 18px; margin-bottom: 6px; color: var(--fg); }
@@ -920,6 +949,12 @@ body.in-telegram .footer { display: none; }
                 <div class="feed-eyebrow"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.5 4.5L18 8l-4.5 1.5L12 14l-1.5-4.5L6 8l4.5-1.5z"/></svg> <span data-i18n="feed">Лента</span></div>
                 <h1 class="feed-title" id="feed-title">Все новости</h1>
                 <p class="feed-subtitle" id="feed-subtitle"></p>
+                <div class="date-filter" id="date-filter">
+                  <button class="date-pill active" data-range="all">Все</button>
+                  <button class="date-pill" data-range="1h">За час</button>
+                  <button class="date-pill" data-range="24h">За день</button>
+                  <button class="date-pill" data-range="7d">За неделю</button>
+                </div>
               </div>
               <div style="position: relative;">
                 <button class="btn" id="source-filter-btn">
@@ -1140,6 +1175,16 @@ body.in-telegram .footer { display: none; }
 <!-- POPOVER BACKDROP -->
 <div class="popover-backdrop" id="popover-backdrop"></div>
 
+<!-- Back to top -->
+<button class="back-to-top" id="back-to-top" aria-label="Наверх">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+</button>
+
+<!-- Pull-to-refresh indicator -->
+<div class="ptr-indicator" id="ptr-indicator">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
+</div>
+
 <!-- TOAST -->
 <div class="toast-wrap" id="toast-wrap"></div>
 
@@ -1304,9 +1349,11 @@ const state = {
   visible: 9,
   activeCat: 'Все',
   query: '',
+  dateRange: 'all',
   selectedSources: [],
   bookmarks: [],
   viewed: {},
+  searchHistory: [],
   lang: 'ru',
   theme: 'light',
   updatedAt: null,
@@ -1328,6 +1375,7 @@ function loadState() {
     if (s.selectedSources) state.selectedSources = s.selectedSources;
     if (s.lang) state.lang = s.lang;
     if (s.theme) state.theme = s.theme;
+    if (s.searchHistory) state.searchHistory = s.searchHistory;
     if (s.dismissedPWA) state.dismissedPWA = s.dismissedPWA;
   } catch (e) {}
 }
@@ -1339,6 +1387,7 @@ function saveState() {
       selectedSources: state.selectedSources,
       lang: state.lang,
       theme: state.theme,
+      searchHistory: state.searchHistory,
       dismissedPWA: state.dismissedPWA,
     }));
   } catch (e) {}
@@ -1495,7 +1544,12 @@ async function fetchRSS(source) {
       const author = stripHtml(getTag('author') || getTag('dc\\:creator') || getTag('creator')) || source.name;
       const descRaw = getTag('description') || getTag('summary') || getTag('content\\:encoded') || '';
       const content = stripHtml(descRaw);
-      const excerpt = content.slice(0, 240);
+      // Fallback: if no description, use first 2 sentences of content
+      let excerpt = content.slice(0, 240);
+      if (!excerpt || excerpt.length < 30) {
+        const sentences = content.match(/[^.!?]+[.!?]+/g) || [];
+        excerpt = sentences.slice(0, 2).join(' ').slice(0, 240) || content.slice(0, 240);
+      }
       // image extraction
       let image = '';
       const enc = item.querySelector('enclosure');
@@ -1821,9 +1875,12 @@ function getHeroArticles() {
   // Apply same filter as applyFilter, but WITHOUT excluding featured (we'll pick from filtered)
   const q = state.query.trim().toLowerCase();
   const sourceSet = new Set(state.selectedSources);
+  const now = Date.now();
+  const rangeMs = state.dateRange === '1h' ? 3600000 : state.dateRange === '24h' ? 86400000 : state.dateRange === '7d' ? 604800000 : 0;
   let pool = state.articles.filter(a => {
     if (state.activeCat !== 'Все' && a.category !== state.activeCat) return false;
     if (sourceSet.size > 0 && !sourceSet.has(a.source.id)) return false;
+    if (rangeMs && (now - new Date(a.publishedAt).getTime()) > rangeMs) return false;
     if (q && !(a.title.toLowerCase().includes(q) || a.excerpt.toLowerCase().includes(q) || a.author.toLowerCase().includes(q) || a.source.name.toLowerCase().includes(q) || a.category.toLowerCase().includes(q))) return false;
     return true;
   });
@@ -1880,7 +1937,7 @@ function renderHero() {
       html += `
         <div class="hero-card" data-cat="${escapeHtml(a.category)}" onclick="openArticle('${a.id}')">
           ${a.image
-            ? `<img class="hero-card-img" src="${escapeHtml(a.image)}" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            ? `<img loading="lazy" class="hero-card-img" src="${escapeHtml(a.image)}" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                <div class="hero-card-img hero-card-img-placeholder" style="display:none; --cat-color: var(--brand);"><img class="source-avatar" src="${sourceAvatar(a.source.name, 64)}" alt=""></div>`
             : `<div class="hero-card-img hero-card-img-placeholder"><img class="source-avatar" src="${sourceAvatar(a.source.name, 64)}" alt=""></div>`}
           <div class="hero-card-body">
@@ -1927,7 +1984,7 @@ function renderGrid() {
       return `
       <article class="card" data-cat="${escapeHtml(a.category)}" onclick="openArticle('${a.id}')">
         <div class="card-img-wrap">
-          <img src="${escapeHtml(a.image)}" alt="${escapeHtml(a.title)}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <img loading="lazy" src="${escapeHtml(a.image)}" alt="${escapeHtml(a.title)}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
           <div class="card-img-placeholder" style="display:none;"><img class="source-avatar" src="${sourceAvatar(a.source.name, 80)}" alt=""><span class="placeholder-cat">${escapeHtml(a.category)}</span></div>
           <span class="card-cat">${a.category}</span>
           <button class="card-bm ${saved ? 'active' : ''}" onclick="event.stopPropagation(); toggleBookmark('${a.id}')" aria-label="Bookmark">
@@ -1935,7 +1992,7 @@ function renderGrid() {
           </button>
         </div>
         <div class="card-body">
-          <div class="card-source"><img src="${a.source.favicon}" alt="">${a.source.name}<span class="time">${timeAgo(a.publishedAt)}</span></div>
+          <div class="card-source"><img src="${a.source.favicon}" alt="">${a.source.name}${isNew(a) ? '<span class="new-badge">Новое</span>' : ''}<span class="time">${timeAgo(a.publishedAt)}</span></div>
           <h3 class="card-title">${escapeHtml(a.title)}</h3>
           ${a.excerpt ? `<p class="card-excerpt">${escapeHtml(a.excerpt)}</p>` : ''}
           <div class="card-meta">
@@ -1952,7 +2009,7 @@ function renderGrid() {
       <article class="card card-text" data-cat="${escapeHtml(a.category)}" onclick="openArticle('${a.id}')">
         <div class="card-text-stripe"></div>
         <div class="card-body card-body-text">
-          <div class="card-source"><img src="${a.source.favicon}" alt="">${a.source.name}<span class="time">${timeAgo(a.publishedAt)}</span></div>
+          <div class="card-source"><img src="${a.source.favicon}" alt="">${a.source.name}${isNew(a) ? '<span class="new-badge">Новое</span>' : ''}<span class="time">${timeAgo(a.publishedAt)}</span></div>
           <span class="card-cat-text">${a.category}</span>
           <h3 class="card-title">${escapeHtml(a.title)}</h3>
           ${a.excerpt ? `<p class="card-excerpt">${escapeHtml(a.excerpt)}</p>` : ''}
@@ -2000,7 +2057,7 @@ function renderSidebar() {
               <div class="trending-meta"><span class="cat">${a.category}</span><span>👁 ${formatViews(a.views)}</span></div>
             </div>
             ${a.image
-              ? `<img class="trending-thumb" src="${escapeHtml(a.image)}" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+              ? `<img loading="lazy" class="trending-thumb" src="${escapeHtml(a.image)}" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                  <div class="trending-thumb trending-thumb-placeholder" style="display:none;"><img class="source-avatar" src="${sourceAvatar(a.source.name, 48)}" alt=""></div>`
               : `<div class="trending-thumb trending-thumb-placeholder"><img class="source-avatar" src="${sourceAvatar(a.source.name, 48)}" alt=""></div>`}
           </div>
@@ -2140,6 +2197,7 @@ function applyFilter() {
 function selectCategory(cat) {
   state.activeCat = cat;
   state.query = '';
+  haptic('light');
   renderAll();
   document.getElementById('feed').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
@@ -2147,6 +2205,7 @@ function selectCategory(cat) {
 function searchTag(tag) {
   state.query = tag;
   state.activeCat = 'Все';
+  saveSearchQuery(tag);
   renderAll();
   document.getElementById('feed').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
@@ -2167,6 +2226,7 @@ function toggleBookmark(id) {
   if (i >= 0) {
     state.bookmarks.splice(i, 1);
     toast(t('bmRemoved'));
+    haptic('light');
   } else {
     state.bookmarks.unshift({ ...a });
     state.bookmarks = state.bookmarks.slice(0, 200);
@@ -2204,7 +2264,7 @@ function renderDrawer() {
   body.innerHTML = state.bookmarks.map(a => `
     <div class="bm-card" data-cat="${escapeHtml(a.category)}" onclick="openArticle('${a.id}')">
       ${a.image
-        ? `<img src="${escapeHtml(a.image)}" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        ? `<img loading="lazy" src="${escapeHtml(a.image)}" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
            <div class="bm-card-img-placeholder" style="display:none;"><img class="source-avatar" src="${sourceAvatar(a.source.name, 48)}" alt=""></div>`
         : `<div class="bm-card-img-placeholder"><img class="source-avatar" src="${sourceAvatar(a.source.name, 48)}" alt=""></div>`}
       <div class="bm-card-body">
@@ -2472,7 +2532,7 @@ function openArticle(id) {
   body.innerHTML = `
     <div class="modal-img" data-cat="${escapeHtml(a.category)}">
       ${a.image
-        ? `<img src="${escapeHtml(a.image)}" alt="${escapeHtml(a.title)}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        ? `<img loading="lazy" src="${escapeHtml(a.image)}" alt="${escapeHtml(a.title)}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
            <div class="modal-img-placeholder" style="display:none;"><img class="source-avatar" src="${sourceAvatar(a.source.name, 128)}" alt=""><div><div class="placeholder-cat">${escapeHtml(a.category)}</div><div class="placeholder-source-name">${escapeHtml(a.source.name)}</div></div></div>`
         : `<div class="modal-img-placeholder"><img class="source-avatar" src="${sourceAvatar(a.source.name, 128)}" alt=""><div><div class="placeholder-cat">${escapeHtml(a.category)}</div><div class="placeholder-source-name">${escapeHtml(a.source.name)}</div></div></div>`}
       <div class="modal-img-overlay"></div>
@@ -2632,7 +2692,7 @@ function renderRelatedArticles(currentArticle) {
       ${related.map(a => `
         <div class="modal-related-item" data-cat="${escapeHtml(a.category)}" onclick="openArticle('${a.id}')">
           ${a.image
-            ? `<img src="${escapeHtml(a.image)}" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            ? `<img loading="lazy" src="${escapeHtml(a.image)}" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                <div class="modal-related-img-placeholder" style="display:none;"><img class="source-avatar" src="${sourceAvatar(a.source.name, 64)}" alt=""></div>`
             : `<div class="modal-related-img-placeholder"><img class="source-avatar" src="${sourceAvatar(a.source.name, 64)}" alt=""></div>`}
           <div class="modal-related-body">
@@ -2731,6 +2791,10 @@ function renderCmdK(q) {
     }
     items.push({ group: '', items: [{ type: 'search-full', data: q, title: (state.lang === 'ru' ? 'Показать все результаты для «' : 'Show all results for "') + q + '"', sub: '', icon: 'search' }] });
   } else {
+    // Search history
+    if (state.searchHistory.length > 0) {
+      items.push({ group: state.lang === 'ru' ? 'Недавние запросы' : 'Recent searches', items: state.searchHistory.map(q => ({ type: 'search-full', data: q, title: q, sub: '', icon: 'search' })) });
+    }
     // Bookmarks
     if (state.bookmarks.length > 0) {
       items.push({ group: t('bookmarks'), items: state.bookmarks.slice(0, 5).map(a => ({ type: 'article', data: a, title: a.title, sub: a.source.name + ' · ' + timeAgo(a.publishedAt), icon: 'bookmark' })) });
@@ -2783,7 +2847,7 @@ function execCmdK(idx) {
   closeCmdK();
   if (it.type === 'article') openArticle(it.data.id);
   else if (it.type === 'category') selectCategory(it.data);
-  else if (it.type === 'search-full') { state.query = it.data; state.activeCat = 'Все'; renderAll(); document.getElementById('feed').scrollIntoView({ behavior: 'smooth' }); }
+  else if (it.type === 'search-full') { state.query = it.data; state.activeCat = 'Все'; saveSearchQuery(it.data); renderAll(); document.getElementById('feed').scrollIntoView({ behavior: 'smooth' }); }
 }
 
 // ---------- LOAD ALL ----------
@@ -2817,6 +2881,70 @@ async function loadAll(force) {
     document.getElementById('loading').style.display = 'none';
     document.getElementById('error').style.display = 'flex';
   }
+}
+
+// ---------- HELPERS (new features) ----------
+
+// Haptic feedback (Telegram WebApp only, no-op elsewhere)
+function haptic(type) {
+  try {
+    if (window.Telegram?.WebApp?.HapticFeedback) {
+      const t = type || 'light';
+      if (t === 'light' || t === 'medium' || t === 'heavy') {
+        window.Telegram.WebApp.HapticFeedback.impactOccurred(t);
+      } else if (t === 'success' || t === 'error' || t === 'warning') {
+        window.Telegram.WebApp.HapticFeedback.notificationOccurred(t);
+      }
+    }
+  } catch (e) {}
+}
+
+// Check if article was published < 1 hour ago
+function isNew(a) {
+  return (Date.now() - new Date(a.publishedAt).getTime()) < 3600000;
+}
+
+// Keyboard navigation: track current article index in filtered list
+let currentArticleIndex = -1;
+function navigateArticles(direction) {
+  const articles = document.querySelectorAll('#grid article, .hero-main, .hero-card');
+  if (articles.length === 0) return;
+  // Remove previous highlight
+  articles.forEach(a => a.style.outline = '');
+  currentArticleIndex += direction;
+  if (currentArticleIndex < 0) currentArticleIndex = articles.length - 1;
+  if (currentArticleIndex >= articles.length) currentArticleIndex = 0;
+  const target = articles[currentArticleIndex];
+  if (target) {
+    target.style.outline = '3px solid var(--brand)';
+    target.style.outlineOffset = '2px';
+    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(() => { target.style.outline = ''; target.style.outlineOffset = ''; }, 2000);
+  }
+}
+function openCurrentArticle() {
+  const articles = document.querySelectorAll('#grid article, .hero-main, .hero-card');
+  if (currentArticleIndex >= 0 && articles[currentArticleIndex]) {
+    articles[currentArticleIndex].click();
+  } else if (articles.length > 0) {
+    articles[0].click();
+  }
+}
+function bookmarkCurrentArticle() {
+  const articles = document.querySelectorAll('#grid article, .hero-main, .hero-card');
+  if (currentArticleIndex >= 0 && articles[currentArticleIndex]) {
+    const bmBtn = articles[currentArticleIndex].querySelector('.card-bm, .card-bm-text');
+    if (bmBtn) bmBtn.click();
+  }
+}
+
+// Save search query to history
+function saveSearchQuery(q) {
+  if (!q || q.length < 2) return;
+  state.searchHistory = state.searchHistory.filter(h => h !== q);
+  state.searchHistory.unshift(q);
+  state.searchHistory = state.searchHistory.slice(0, 5);
+  saveState();
 }
 
 // ---------- EVENTS ----------
@@ -3025,6 +3153,97 @@ function setupEvents() {
     }
   });
 
+  // ===== NEW FEATURES =====
+
+  // Back to top button
+  const backToTop = document.getElementById('back-to-top');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 600) backToTop.classList.add('visible');
+    else backToTop.classList.remove('visible');
+  }, { passive: true });
+  backToTop.onclick = () => { window.scrollTo({ top: 0, behavior: 'smooth' }); haptic('light'); };
+
+  // Date filter pills
+  document.querySelectorAll('.date-pill').forEach(pill => {
+    pill.onclick = () => {
+      state.dateRange = pill.dataset.range;
+      document.querySelectorAll('.date-pill').forEach(p => p.classList.toggle('active', p === pill));
+      renderAll();
+      haptic('light');
+    };
+  });
+
+  // Keyboard shortcuts (desktop only)
+  document.addEventListener('keydown', (e) => {
+    // Skip if typing in input/textarea or modal/cmdk/drawer open
+    const tag = e.target.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+    const anyOpen = document.getElementById('modal-backdrop').classList.contains('open')
+      || document.getElementById('cmdk-backdrop').classList.contains('open')
+      || document.getElementById('drawer').classList.contains('open')
+      || document.getElementById('menu-drawer').classList.contains('open');
+    if (anyOpen) return;
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+
+    if (e.key === 'j' || e.key === 'J') {
+      e.preventDefault();
+      navigateArticles(1);
+    } else if (e.key === 'k' || e.key === 'K') {
+      e.preventDefault();
+      navigateArticles(-1);
+    } else if (e.key === 'o' || e.key === 'O') {
+      e.preventDefault();
+      openCurrentArticle();
+    } else if (e.key === 'b' || e.key === 'B') {
+      e.preventDefault();
+      bookmarkCurrentArticle();
+    } else if (e.key === '/') {
+      e.preventDefault();
+      openCmdK();
+    } else if (e.key === 'r' || e.key === 'R') {
+      e.preventDefault();
+      loadAll(true);
+      toast('Обновляем ленту…');
+    }
+  });
+
+  // Pull-to-refresh (mobile)
+  let ptrStartY = 0, ptrPulling = false, ptrDistance = 0;
+  const ptrIndicator = document.getElementById('ptr-indicator');
+  document.addEventListener('touchstart', (e) => {
+    if (window.scrollY <= 0 && !document.getElementById('modal-backdrop').classList.contains('open')) {
+      ptrStartY = e.touches[0].clientY;
+      ptrPulling = true;
+      ptrDistance = 0;
+    }
+  }, { passive: true });
+  document.addEventListener('touchmove', (e) => {
+    if (!ptrPulling) return;
+    ptrDistance = e.touches[0].clientY - ptrStartY;
+    if (ptrDistance > 0 && ptrDistance < 120) {
+      ptrIndicator.classList.add('visible');
+      ptrIndicator.style.transform = `translateX(-50%) translateY(${ptrDistance - 40}px)`;
+    }
+  }, { passive: true });
+  document.addEventListener('touchend', () => {
+    if (!ptrPulling) return;
+    ptrPulling = false;
+    if (ptrDistance > 70) {
+      ptrIndicator.classList.add('spin');
+      ptrIndicator.style.transform = 'translateX(-50%) translateY(20px)';
+      loadAll(true).then(() => {
+        setTimeout(() => {
+          ptrIndicator.classList.remove('visible', 'spin');
+          ptrIndicator.style.transform = '';
+        }, 500);
+      });
+    } else {
+      ptrIndicator.classList.remove('visible');
+      ptrIndicator.style.transform = '';
+    }
+    ptrDistance = 0;
+  });
+
   // PWA install
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
@@ -3203,6 +3422,28 @@ function setupTelegramWebApp(tg) {
       const el = document.getElementById(id);
       if (el) observer.observe(el, { attributes: true, attributeFilter: ['class'] });
     });
+    // Setup MainButton — "Поделиться приложением"
+    if (tg.MainButton) {
+      tg.MainButton.setText('Поделиться MOMENTUM');
+      tg.MainButton.show();
+      tg.MainButton.onClick(() => {
+        try {
+          // Try native share first
+          if (navigator.share) {
+            navigator.share({
+              title: 'MOMENTUM — Новости в движении',
+              text: 'Свежие новости из 12 источников',
+              url: 'https://digerr.github.io/momentum-news/',
+            });
+          } else {
+            // Fallback: copy to clipboard
+            navigator.clipboard.writeText('https://digerr.github.io/momentum-news/');
+            toast('Ссылка скопирована!', 'success');
+          }
+          haptic('success');
+        } catch (e) {}
+      });
+    }
     console.log('[MOMENTUM] Telegram WebApp initialized');
   } catch (e) {
     console.warn('[MOMENTUM] Telegram WebApp init error:', e);
