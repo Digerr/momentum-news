@@ -2362,6 +2362,87 @@ function saveFullCache() {
   try { localStorage.setItem(FULL_CACHE_KEY, JSON.stringify(fullTextCache)); } catch (e) {}
 }
 
+// ---------- OG IMAGE CACHE ----------
+const OG_IMG_CACHE_KEY = 'momentum-ogimg-cache-v1';
+let ogImgCache = {};
+try { ogImgCache = JSON.parse(localStorage.getItem(OG_IMG_CACHE_KEY) || '{}'); } catch (e) {}
+function saveOgImgCache() {
+  const keys = Object.keys(ogImgCache);
+  if (keys.length > 200) {
+    keys.slice(0, keys.length - 200).forEach(k => delete ogImgCache[k]);
+  }
+  try { localStorage.setItem(OG_IMG_CACHE_KEY, JSON.stringify(ogImgCache)); } catch (e) {}
+}
+
+// Background: fetch og:image for articles without photos
+// Processes 3 articles at a time, updates card in DOM when found
+async function fetchMissingImages() {
+  // Apply cached images first
+  let updated = false;
+  for (const a of state.articles) {
+    if (!a.image && ogImgCache[a.id]) {
+      a.image = ogImgCache[a.id];
+      updated = true;
+    }
+  }
+  if (updated) renderAll();
+
+  // Find articles still without image, limit to 15 to avoid hammering proxy
+  const needImg = state.articles.filter(a => !a.image && a.link && a.link !== a.source.url).slice(0, 15);
+  if (needImg.length === 0) return;
+
+  // Process in batches of 3
+  for (let i = 0; i < needImg.length; i += 3) {
+    const batch = needImg.slice(i, i + 3);
+    await Promise.allSettled(batch.map(a => fetchOgImage(a)));
+    // Re-render after each batch so images appear progressively
+    renderAll();
+  }
+}
+
+async function fetchOgImage(article) {
+  if (ogImgCache[article.id]) {
+    article.image = ogImgCache[article.id];
+    return;
+  }
+  try {
+    let html = '';
+    for (const makeUrl of CORS_PROXIES) {
+      try {
+        const res = await fetch(makeUrl(article.link), {
+          signal: AbortSignal.timeout(8000),
+          headers: { 'Accept': 'text/html' },
+        });
+        if (!res.ok) continue;
+        const text = await res.text();
+        if (text && text.length > 200 && (text.includes('<html') || text.includes('<head'))) {
+          html = text;
+          break;
+        }
+      } catch (e) {}
+    }
+    if (!html) return;
+
+    // Extract og:image from meta tag
+    const m = html.match(/<meta\s+(?:property|name)=["']og:image["']\s+content=["']([^"']+)["']/i)
+           || html.match(/<meta\s+content=["']([^"']+)["']\s+(?:property|name)=["']og:image["']/i);
+    if (m && m[1]) {
+      let imgUrl = m[1].trim();
+      // Fix relative URLs
+      if (imgUrl.startsWith('//')) imgUrl = 'https:' + imgUrl;
+      else if (imgUrl.startsWith('/')) {
+        try { imgUrl = new URL(article.link).origin + imgUrl; } catch (e) {}
+      }
+      // Verify it looks like a real image URL
+      if (imgUrl.startsWith('http') && !imgUrl.includes('blank.gif') && imgUrl.length > 20) {
+        article.image = imgUrl;
+        ogImgCache[article.id] = imgUrl;
+        saveOgImgCache();
+      }
+    }
+  } catch (e) {}
+}
+
 // Source-specific extractors. Each returns a string with the full article text.
 function extractArticleText(html, sourceId) {
   // Try JSON-LD first (works for Lenta, Коммерсант, sometimes others)
@@ -2876,6 +2957,8 @@ async function loadAll(force) {
     document.getElementById('loading').style.display = 'none';
     document.getElementById('content').style.display = 'block';
     renderAll();
+    // Background: fetch og:image for articles without photos
+    fetchMissingImages();
   } catch (e) {
     console.error(e);
     document.getElementById('loading').style.display = 'none';
@@ -3422,28 +3505,6 @@ function setupTelegramWebApp(tg) {
       const el = document.getElementById(id);
       if (el) observer.observe(el, { attributes: true, attributeFilter: ['class'] });
     });
-    // Setup MainButton — "Поделиться приложением"
-    if (tg.MainButton) {
-      tg.MainButton.setText('Поделиться MOMENTUM');
-      tg.MainButton.show();
-      tg.MainButton.onClick(() => {
-        try {
-          // Try native share first
-          if (navigator.share) {
-            navigator.share({
-              title: 'MOMENTUM — Новости в движении',
-              text: 'Свежие новости из 12 источников',
-              url: 'https://digerr.github.io/momentum-news/',
-            });
-          } else {
-            // Fallback: copy to clipboard
-            navigator.clipboard.writeText('https://digerr.github.io/momentum-news/');
-            toast('Ссылка скопирована!', 'success');
-          }
-          haptic('success');
-        } catch (e) {}
-      });
-    }
     console.log('[MOMENTUM] Telegram WebApp initialized');
   } catch (e) {
     console.warn('[MOMENTUM] Telegram WebApp init error:', e);
