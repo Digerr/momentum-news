@@ -466,6 +466,106 @@ body.text-only-mode .card:not(.card-text) { border-top: 4px solid var(--cat-colo
 .new-articles-toast { position: fixed; top: 16px; left: 50%; transform: translateX(-50%) translateY(-80px); z-index: 95; padding: 10px 20px; border-radius: 999px; background: var(--brand); color: #fff; font-size: 13px; font-weight: 700; cursor: pointer; box-shadow: var(--shadow-lg); transition: transform .3s ease; white-space: nowrap; }
 .new-articles-toast.visible { transform: translateX(-50%) translateY(0); }
 
+/* ============ BATCH 2-6 FEATURES ============ */
+
+/* #1 Onboarding overlay */
+.onboarding { position: fixed; inset: 0; background: var(--bg); z-index: 200; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 24px; text-align: center; }
+.onboarding.open { display: flex; }
+.onboarding-logo { width: 72px; height: 72px; border-radius: 18px; background: linear-gradient(135deg, var(--brand), var(--brand-2)); display: grid; place-items: center; margin-bottom: 20px; box-shadow: 0 8px 24px rgba(220,38,38,0.3); }
+.onboarding-logo svg { width: 40px; height: 40px; color: #fff; }
+.onboarding h2 { font-family: 'Playfair Display', Georgia, serif; font-size: 28px; font-weight: 900; margin-bottom: 8px; }
+.onboarding p { font-size: 15px; color: var(--fg-2); margin-bottom: 24px; max-width: 340px; }
+.onboarding-chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; max-width: 360px; margin-bottom: 24px; }
+.onboarding-chip { padding: 10px 18px; border-radius: 999px; border: 2px solid var(--border); background: var(--card); font-size: 14px; font-weight: 600; cursor: pointer; transition: all .15s; display: inline-flex; align-items: center; gap: 6px; }
+.onboarding-chip::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--cat-color, var(--brand)); }
+.onboarding-chip.selected { border-color: var(--brand); background: var(--brand-soft); color: var(--brand); }
+.onboarding-btn { padding: 12px 32px; border-radius: 999px; background: var(--brand); color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; border: none; }
+.onboarding-skip { margin-top: 12px; font-size: 13px; color: var(--fg-3); cursor: pointer; }
+
+/* #2 Long-press context menu */
+.ctx-menu { position: fixed; z-index: 130; background: var(--card); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow-lg); padding: 6px; min-width: 200px; display: none; }
+.ctx-menu.open { display: block; }
+.ctx-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px; cursor: pointer; font-size: 14px; transition: background .12s; }
+.ctx-item:hover { background: var(--bg-3); }
+.ctx-item svg { width: 16px; height: 16px; color: var(--fg-2); }
+.ctx-item.danger { color: var(--rose); }
+.ctx-item.danger svg { color: var(--rose); }
+
+/* #10 Skeleton for modal */
+.modal-skeleton { padding: 24px; }
+.modal-skeleton .sk-line { height: 16px; border-radius: 4px; margin-bottom: 12px; animation: shimmer 1.5s infinite; background: linear-gradient(90deg, var(--bg-3) 0%, var(--border) 50%, var(--bg-3) 100%); background-size: 200% 100%; }
+.modal-skeleton .sk-title { height: 28px; width: 80%; margin-bottom: 20px; }
+.modal-skeleton .sk-line:nth-child(3) { width: 95%; }
+.modal-skeleton .sk-line:nth-child(4) { width: 88%; }
+.modal-skeleton .sk-line:nth-child(5) { width: 92%; }
+.modal-skeleton .sk-line:nth-child(6) { width: 70%; }
+
+/* #11 Swipe hint in modal */
+.swipe-hint { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); padding: 6px 14px; border-radius: 999px; background: rgba(0,0,0,0.5); color: #fff; font-size: 11px; font-weight: 600; backdrop-filter: blur(8px); z-index: 105; pointer-events: none; opacity: 0; transition: opacity .3s; }
+.swipe-hint.visible { opacity: 0.8; }
+
+/* #15 Bottom navigation (mobile) */
+.bottom-nav { display: none; position: fixed; bottom: 0; left: 0; right: 0; height: calc(56px + env(safe-area-inset-bottom)); padding-bottom: env(safe-area-inset-bottom); background: var(--card); border-top: 1px solid var(--border); z-index: 55; justify-content: space-around; align-items: center; }
+@media (max-width: 767px) { .bottom-nav { display: flex; } body:not(.in-telegram) main { padding-bottom: 60px; } body:not(.in-telegram) .back-to-top { bottom: 72px; } }
+.bottom-nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; color: var(--fg-3); font-size: 10px; font-weight: 600; cursor: pointer; padding: 4px; transition: color .15s; position: relative; }
+.bottom-nav-item.active { color: var(--brand); }
+.bottom-nav-item svg { width: 22px; height: 22px; }
+.bottom-nav-item .nav-badge { position: absolute; top: 0; right: 8px; background: var(--brand); color: #fff; font-size: 9px; min-width: 16px; height: 16px; border-radius: 999px; display: grid; place-items: center; padding: 0 4px; }
+
+/* #6 Font size control in modal */
+.font-size-control { display: flex; gap: 4px; align-items: center; }
+.font-size-btn { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-2); cursor: pointer; font-size: 13px; font-weight: 700; display: grid; place-items: center; transition: all .15s; }
+.font-size-btn:hover { border-color: var(--brand); color: var(--brand); }
+.font-size-btn.active { background: var(--brand); color: #fff; border-color: var(--brand); }
+
+/* #18-19 Stats panel in sidebar */
+.stats-panel { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 20px; }
+.stats-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.stats-row:last-child { border-bottom: none; }
+.stats-label { font-size: 13px; color: var(--fg-2); }
+.stats-value { font-size: 15px; font-weight: 700; }
+.stats-streak { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 999px; background: rgba(245,158,11,0.12); color: #f59e0b; font-size: 12px; font-weight: 700; }
+
+/* #20 Popular article badge */
+.popular-badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 4px; background: linear-gradient(135deg, #f59e0b, #ef4444); color: #fff; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+
+/* #27 Geolocation weather button */
+.geo-btn { cursor: pointer; transition: opacity .15s; }
+.geo-btn:hover { opacity: 0.7; }
+
+/* #32 Prefetch hint */
+article.card { contain: layout style; }
+
+/* #4 Read-all mode toggle */
+body.read-all-mode #hero { display: none; }
+body.read-all-mode .feed-head { margin-bottom: 16px; }
+body.read-all-mode #grid { column-count: 1 !important; }
+body.read-all-mode .sidebar { display: none; }
+body.read-all-mode .feed-wrap { grid-template-columns: 1fr !important; }
+
+/* #7 Modal table of contents */
+.modal-toc { position: sticky; top: 0; max-height: 200px; overflow-y: auto; padding: 12px; background: var(--bg-3); border-radius: 8px; margin-bottom: 16px; font-size: 12px; display: none; }
+.modal-toc.visible { display: block; }
+.modal-toc-title { font-weight: 700; margin-bottom: 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--fg-3); }
+.modal-toc a { display: block; padding: 3px 0; color: var(--fg-2); text-decoration: none; transition: color .12s; }
+.modal-toc a:hover { color: var(--brand); }
+
+/* #24 AI translate button */
+.translate-btn { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 6px; background: var(--bg-3); border: 1px solid var(--border); font-size: 11px; font-weight: 600; cursor: pointer; transition: all .15s; }
+.translate-btn:hover { border-color: var(--brand); color: var(--brand); }
+.translate-btn.loading { opacity: 0.6; pointer-events: none; }
+.translate-btn svg { width: 12px; height: 12px; }
+
+/* #23 AI digest */
+.digest-panel { background: linear-gradient(135deg, var(--brand-soft), rgba(99,102,241,0.06)); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 20px; }
+.digest-panel h3 { font-family: 'Playfair Display', Georgia, serif; font-size: 16px; font-weight: 800; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+.digest-panel h3 svg { width: 16px; height: 16px; color: var(--brand); }
+.digest-content { font-size: 13px; line-height: 1.6; color: var(--fg-2); }
+.digest-content p { margin-bottom: 6px; }
+.digest-loading { display: inline-flex; align-items: center; gap: 6px; color: var(--fg-3); font-size: 12px; }
+.digest-loading .spinner { width: 14px; height: 14px; border: 2px solid var(--border); border-top-color: var(--brand); border-radius: 50%; animation: spin 0.8s linear infinite; }
+.digest-btn { margin-top: 8px; }
+
 .empty { padding: 64px 24px; text-align: center; color: var(--fg-2); }
 .empty h3 { font-size: 18px; margin-bottom: 6px; color: var(--fg); }
 .empty p { font-size: 14px; }
@@ -1258,6 +1358,36 @@ body.in-telegram .footer { display: none; }
     <button class="btn btn-brand kbd-help-close" onclick="document.getElementById('kbd-overlay').classList.remove('open')">Понятно</button>
   </div>
 </div>
+
+<!-- Onboarding -->
+<div class="onboarding" id="onboarding">
+  <div class="onboarding-logo"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h7l-1 8 11-12h-7l0-8z"/></svg></div>
+  <h2>Добро пожаловать в MOMENTUM</h2>
+  <p>Выберите интересные категории — мы настроим ленту под вас</p>
+  <div class="onboarding-chips" id="onboarding-chips"></div>
+  <button class="onboarding-btn" id="onboarding-done">Продолжить</button>
+  <div class="onboarding-skip" id="onboarding-skip">Пропустить</div>
+</div>
+
+<!-- Context menu (long-press) -->
+<div class="ctx-menu" id="ctx-menu">
+  <div class="ctx-item" id="ctx-open"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>Открыть</div>
+  <div class="ctx-item" id="ctx-bookmark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>В закладки</div>
+  <div class="ctx-item" id="ctx-share"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>Поделиться</div>
+  <div class="ctx-item danger" id="ctx-hide-source"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><path d="M1 1l22 22"/></svg>Скрыть источник</div>
+</div>
+
+<!-- Swipe hint -->
+<div class="swipe-hint" id="swipe-hint">← свайп для следующей статьи →</div>
+
+<!-- Bottom navigation (mobile) -->
+<nav class="bottom-nav" id="bottom-nav">
+  <div class="bottom-nav-item active" data-nav="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Главная</div>
+  <div class="bottom-nav-item" data-nav="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>Поиск</div>
+  <div class="bottom-nav-item" data-nav="bookmarks"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg><span class="nav-badge" id="nav-bm-badge" style="display:none">0</span>Закладки</div>
+  <div class="bottom-nav-item" data-nav="categories"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>Категории</div>
+  <div class="bottom-nav-item" data-nav="menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Меню</div>
+</nav>
 
 <!-- TOAST -->
 <div class="toast-wrap" id="toast-wrap"></div>
@@ -2225,6 +2355,14 @@ function renderSidebar() {
     </div>
   `;
 
+  // Stats panel (#18-19)
+  html += renderStatsPanel();
+  // AI Digest panel (#23)
+  html += `<div class="digest-panel">
+    <h3><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.5 4.5L18 8l-4.5 1.5L12 14l-1.5-4.5L6 8l4.5-1.5z"/></svg> Дайджест дня</h3>
+    <div class="digest-content" id="digest-content"><p style="color:var(--fg-3); font-size:12px;">Нажмите чтобы сгенерировать</p></div>
+    <button class="btn btn-brand digest-btn" onclick="generateDigest()">Сгенерировать</button>
+  </div>`;
   document.getElementById('sidebar').innerHTML = html;
 }
 
@@ -2755,6 +2893,16 @@ function openArticle(id) {
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l1.5 4.5L18 8l-4.5 1.5L12 14l-1.5-4.5L6 8l4.5-1.5z"/></svg>
           AI
         </button>
+        <button class="translate-btn" id="modal-translate-btn" onclick="translateArticle()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5h12M9 3v2c0 4.418-2.239 8-5 8M5 9c0 2.144 2.952 3.908 6.7 4M12 20l4-9 4 9M14.5 16h5"/></svg>
+          EN
+        </button>
+        <div class="font-size-control" id="modal-font-control">
+          <button class="font-size-btn" onclick="setModalFontSize(0.85)">S</button>
+          <button class="font-size-btn active" onclick="setModalFontSize(1)">M</button>
+          <button class="font-size-btn" onclick="setModalFontSize(1.15)">L</button>
+          <button class="font-size-btn" onclick="setModalFontSize(1.3)">XL</button>
+        </div>
       </div>
       <div class="modal-related" id="modal-related"></div>
     </div>
@@ -3257,6 +3405,284 @@ function saveSearchQuery(q) {
   saveState();
 }
 
+// ---------- BATCH 2-6 HELPERS ----------
+
+// #1 Onboarding
+function showOnboarding() {
+  if (state.onboarded) return;
+  const chipsEl = document.getElementById('onboarding-chips');
+  const cats = CATEGORIES.filter(c => c !== 'Все');
+  chipsEl.innerHTML = cats.map(c => `<div class="onboarding-chip" data-cat="${c}" style="--cat-color: var(--cat-${['Игры','Спорт','Технологии','Бизнес','Наука','Культура','Мир','Общество','Происшествия'].indexOf(c) >= 0 ? ['games','sport','tech','business','science','culture','world','society','incidents'][['Игры','Спорт','Технологии','Бизнес','Наука','Культура','Мир','Общество','Происшествия'].indexOf(c)] : 'brand'})">${c}</div>`).join('');
+  chipsEl.querySelectorAll('.onboarding-chip').forEach(chip => {
+    chip.onclick = () => {
+      chip.classList.toggle('selected');
+      const cat = chip.dataset.cat;
+      const idx = state.selectedInterests.indexOf(cat);
+      if (idx >= 0) state.selectedInterests.splice(idx, 1);
+      else state.selectedInterests.push(cat);
+    };
+  });
+  document.getElementById('onboarding-done').onclick = () => {
+    state.onboarded = true;
+    saveState();
+    document.getElementById('onboarding').classList.remove('open');
+    if (state.selectedInterests.length > 0) {
+      // Filter by interests (user can change later)
+      toast(`Выбрано категорий: ${state.selectedInterests.length}`);
+    }
+  };
+  document.getElementById('onboarding-skip').onclick = () => {
+    state.onboarded = true;
+    state.selectedInterests = [];
+    saveState();
+    document.getElementById('onboarding').classList.remove('open');
+  };
+  document.getElementById('onboarding').classList.add('open');
+}
+
+// #2 Long-press + context menu
+let ctxArticleId = null;
+let longPressTimer = null;
+function setupLongPress() {
+  document.addEventListener('touchstart', (e) => {
+    const card = e.target.closest('#grid article, .hero-card, .hero-main');
+    if (!card) return;
+    const articleId = card.getAttribute('onclick')?.match(/'([^']+)'/)?.[1];
+    if (!articleId) return;
+    longPressTimer = setTimeout(() => {
+      ctxArticleId = articleId;
+      const touch = e.touches[0];
+      const menu = document.getElementById('ctx-menu');
+      menu.style.left = Math.min(touch.clientX, window.innerWidth - 210) + 'px';
+      menu.style.top = Math.min(touch.clientY, window.innerHeight - 200) + 'px';
+      menu.classList.add('open');
+      haptic('medium');
+    }, 500);
+  }, { passive: true });
+  document.addEventListener('touchend', () => { clearTimeout(longPressTimer); }, { passive: true });
+  document.addEventListener('touchmove', () => { clearTimeout(longPressTimer); }, { passive: true });
+  // Close on click outside
+  document.addEventListener('click', (e) => {
+    const menu = document.getElementById('ctx-menu');
+    if (!menu.classList.contains('open')) return;
+    if (!e.target.closest('.ctx-menu')) menu.classList.remove('open');
+  });
+  // Context menu actions
+  document.getElementById('ctx-open').onclick = () => { if (ctxArticleId) openArticle(ctxArticleId); document.getElementById('ctx-menu').classList.remove('open'); };
+  document.getElementById('ctx-bookmark').onclick = () => { if (ctxArticleId) toggleBookmark(ctxArticleId); document.getElementById('ctx-menu').classList.remove('open'); };
+  document.getElementById('ctx-share').onclick = async () => {
+    if (ctxArticleId) {
+      const a = state.articles.find(x => x.id === ctxArticleId);
+      if (a) await shareArticle(a);
+    }
+    document.getElementById('ctx-menu').classList.remove('open');
+  };
+  document.getElementById('ctx-hide-source').onclick = () => {
+    if (ctxArticleId) {
+      const a = state.articles.find(x => x.id === ctxArticleId);
+      if (a) {
+        state.hiddenSources.push(a.source.id);
+        saveState();
+        renderAll();
+        toast(`Источник «${a.source.name}» скрыт`);
+      }
+    }
+    document.getElementById('ctx-menu').classList.remove('open');
+  };
+}
+
+// #11 Swipe in modal (next/prev article)
+function setupModalSwipe() {
+  const modal = document.getElementById('modal-backdrop');
+  let startX = 0, startY = 0, isSwiping = false;
+  modal.addEventListener('touchstart', (e) => {
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    isSwiping = false;
+  }, { passive: true });
+  modal.addEventListener('touchmove', (e) => {
+    const dx = e.touches[0].clientX - startX;
+    const dy = e.touches[0].clientY - startY;
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 2) isSwiping = true;
+  }, { passive: true });
+  modal.addEventListener('touchend', (e) => {
+    if (!isSwiping || !state.currentArticle) return;
+    const dx = e.changedTouches[0].clientX - startX;
+    const { featured, secondary, pool } = getHeroArticles();
+    const excludeIds = new Set([featured?.id, ...secondary.map(a => a.id)]);
+    const gridArticles = pool.filter(a => !excludeIds.has(a.id));
+    const allArticles = [featured, ...secondary, ...gridArticles].filter(Boolean);
+    const currentIdx = allArticles.findIndex(a => a.id === state.currentArticle.id);
+    if (dx < 0 && currentIdx < allArticles.length - 1) {
+      openArticle(allArticles[currentIdx + 1].id);
+      haptic('light');
+    } else if (dx > 0 && currentIdx > 0) {
+      openArticle(allArticles[currentIdx - 1].id);
+      haptic('light');
+    }
+  }, { passive: true });
+  // Show swipe hint briefly when modal opens
+  const observer = new MutationObserver(() => {
+    if (modal.classList.contains('open')) {
+      const hint = document.getElementById('swipe-hint');
+      hint.classList.add('visible');
+      setTimeout(() => hint.classList.remove('visible'), 2500);
+    }
+  });
+  observer.observe(modal, { attributes: true, attributeFilter: ['class'] });
+}
+
+// #15 Bottom navigation
+function setupBottomNav() {
+  document.querySelectorAll('.bottom-nav-item').forEach(item => {
+    item.onclick = () => {
+      document.querySelectorAll('.bottom-nav-item').forEach(i => i.classList.remove('active'));
+      item.classList.add('active');
+      haptic('light');
+      const nav = item.dataset.nav;
+      if (nav === 'home') window.scrollTo({ top: 0, behavior: 'smooth' });
+      else if (nav === 'search') openCmdK();
+      else if (nav === 'bookmarks') openDrawer();
+      else if (nav === 'categories') document.getElementById('feed').scrollIntoView({ behavior: 'smooth' });
+      else if (nav === 'menu') openMenuDrawer();
+      setTimeout(() => item.classList.remove('active'), 100);
+      // Re-add active to home after action
+      setTimeout(() => {
+        document.querySelector('.bottom-nav-item[data-nav="home"]')?.classList.add('active');
+      }, 300);
+    };
+  });
+}
+
+// #6 Font size in modal
+let modalFontSize = 1; // 1 = default, 0.85 = S, 1.15 = L, 1.3 = XL
+function renderFontSizeControl() {
+  return `<div class="font-size-control">
+    <button class="font-size-btn ${modalFontSize === 0.85 ? 'active' : ''}" onclick="setModalFontSize(0.85)">S</button>
+    <button class="font-size-btn ${modalFontSize === 1 ? 'active' : ''}" onclick="setModalFontSize(1)">M</button>
+    <button class="font-size-btn ${modalFontSize === 1.15 ? 'active' : ''}" onclick="setModalFontSize(1.15)">L</button>
+    <button class="font-size-btn ${modalFontSize === 1.3 ? 'active' : ''}" onclick="setModalFontSize(1.3)">XL</button>
+  </div>`;
+}
+function setModalFontSize(size) {
+  modalFontSize = size;
+  const content = document.getElementById('modal-content');
+  if (content) content.style.fontSize = (16 * size) + 'px';
+  document.querySelectorAll('.font-size-btn').forEach(b => b.classList.remove('active'));
+  event?.target?.classList.add('active');
+}
+
+// #18-19 Stats panel in sidebar
+function renderStatsPanel() {
+  const stats = state.readingStats;
+  // Count top sources from viewed articles
+  const sourceCounts = {};
+  for (const [id, v] of Object.entries(state.viewed)) {
+    const a = state.articles.find(x => x.id === id) || state.bookmarks.find(x => x.id === id);
+    if (a) sourceCounts[a.source.name] = (sourceCounts[a.source.name] || 0) + v.count;
+  }
+  const topSources = Object.entries(sourceCounts).sort((a, b) => b[1] - a[1]).slice(0, 3);
+  return `<div class="panel">
+    <div class="panel-title"><h2>Моя статистика</h2></div>
+    <div class="stats-panel" style="border:none; padding:0;">
+      <div class="stats-row"><span class="stats-label">Сегодня прочитано</span><span class="stats-value">${stats.today}</span></div>
+      <div class="stats-row"><span class="stats-label">Всего прочитано</span><span class="stats-value">${stats.total}</span></div>
+      <div class="stats-row"><span class="stats-label">Серия дней</span><span class="stats-streak">🔥 ${stats.streak}</span></div>
+      ${topSources.length > 0 ? `<div style="margin-top:12px; font-size:11px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.05em; font-weight:700;">Топ источники</div>
+      ${topSources.map(([name, count]) => `<div class="stats-row"><span class="stats-label">${name}</span><span class="stats-value">${count}</span></div>`).join('')}` : ''}
+      ${stats.achievements.length > 0 ? `<div style="margin-top:12px; font-size:11px; color:var(--fg-3); text-transform:uppercase; letter-spacing:0.05em; font-weight:700;">Достижения</div>
+      <div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:4px;">${stats.achievements.map(id => {
+        const names = {first:'🌟 Первая', active:'📰 Активный', expert:'🎯 Эксперт', master:'👑 Мастер', addict:'🔥 Зависимый'};
+        return `<span style="padding:3px 8px; border-radius:6px; background:var(--brand-soft); font-size:11px; font-weight:600; color:var(--brand);">${names[id] || id}</span>`;
+      }).join('')}</div>` : ''}
+    </div>
+  </div>`;
+}
+
+// #27 Weather by geolocation
+function fetchWeatherByGeo() {
+  if (!navigator.geolocation) { toast('Геолокация не поддерживается'); return; }
+  toast('Определяем местоположение…');
+  navigator.geolocation.getCurrentPosition(async (pos) => {
+    try {
+      const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${pos.coords.latitude}&longitude=${pos.coords.longitude}&current=temperature_2m,weather_code&timezone=auto`);
+      const json = await res.json();
+      const wmo = { 0: {l:'Ясно',e:'☀️'}, 1: {l:'Малооблачно',e:'🌤️'}, 2: {l:'Облачно',e:'⛅'}, 3: {l:'Пасмурно',e:'☁️'}, 45: {l:'Туман',e:'🌫️'}, 51: {l:'Морось',e:'🌦️'}, 61: {l:'Дождь',e:'🌧️'}, 71: {l:'Снег',e:'❄️'}, 80: {l:'Ливень',e:'🌧️'}, 95: {l:'Гроза',e:'⛈️'} };
+      const code = json.current?.weather_code ?? 0;
+      const w = wmo[code] || {l:'—',e:'🌡️'};
+      state.weather = { city: 'Моя погода', temperature: Math.round(json.current?.temperature_2m ?? 0), label: w.l, emoji: w.e };
+      renderTicker();
+      toast('Погода обновлена по вашему местоположению', 'success');
+    } catch (e) { toast('Не удалось получить погоду', 'error'); }
+  }, (err) => { toast('Доступ к геолокации запрещён', 'error'); }, { timeout: 10000 });
+}
+
+// #32 Prefetch on hover
+function setupPrefetch() {
+  document.addEventListener('mouseover', (e) => {
+    const card = e.target.closest('#grid article, .hero-card, .hero-main');
+    if (!card) return;
+    const articleId = card.getAttribute('onclick')?.match(/'([^']+)'/)?.[1];
+    if (!articleId) return;
+    const a = state.articles.find(x => x.id === articleId);
+    if (!a || !a.link || fullTextCache[articleId]) return;
+    // Prefetch article text in background (don't await)
+    fetchFullArticle(a).catch(() => {});
+  }, { passive: true });
+}
+
+// #4 Read-all mode toggle
+function toggleReadAllMode() {
+  document.body.classList.toggle('read-all-mode');
+  const isEnabled = document.body.classList.contains('read-all-mode');
+  toast(isEnabled ? 'Режим «Читать всё» включён' : 'Режим «Читать всё» выключен');
+  haptic('light');
+}
+
+// #23 AI Digest
+async function generateDigest() {
+  const panel = document.getElementById('digest-content');
+  if (!panel) return;
+  panel.innerHTML = '<div class="digest-loading"><div class="spinner"></div> Анализируем новости за день…</div>';
+  // Get top 10 articles by views
+  const top = [...state.articles].sort((a, b) => b.views - a.views).slice(0, 10);
+  // Generate summary from titles
+  const byCategory = {};
+  for (const a of top) {
+    if (!byCategory[a.category]) byCategory[a.category] = [];
+    byCategory[a.category].push(a.title);
+  }
+  let html = '';
+  for (const [cat, titles] of Object.entries(byCategory)) {
+    html += `<p><strong>${cat}:</strong> ${titles.slice(0, 3).join('; ')}</p>`;
+  }
+  panel.innerHTML = html || '<p>Недостаточно данных для дайджеста</p>';
+}
+
+// #24 AI Translate
+async function translateArticle() {
+  const btn = document.querySelector('.translate-btn');
+  if (btn) btn.classList.add('loading');
+  const content = document.getElementById('modal-content');
+  if (!content) return;
+  const text = content.innerText.slice(0, 500);
+  try {
+    const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=ru|en`);
+    const json = await res.json();
+    if (json.responseData) {
+      content.innerHTML = '<p style="font-size:14px; line-height:1.7;">' + escapeHtml(json.responseData.translatedText) + '</p><p style="margin-top:12px; font-size:12px; color:var(--fg-3);">Переведено через MyMemory API</p>';
+      toast('Статья переведена на английский', 'success');
+    }
+  } catch (e) { toast('Не удалось перевести', 'error'); }
+  if (btn) btn.classList.remove('loading');
+}
+
+// #20 Popular article badge
+function getPopularArticle() {
+  if (state.articles.length === 0) return null;
+  return [...state.articles].sort((a, b) => b.views - a.views)[0];
+}
+
 // ---------- EVENTS ----------
 function setupEvents() {
   // Menu drawer (left)
@@ -3472,6 +3898,10 @@ function setupEvents() {
   });
 
   // ===== NEW FEATURES =====
+  setupLongPress();
+  setupModalSwipe();
+  setupBottomNav();
+  setupPrefetch();
 
   // Back to top button
   const backToTop = document.getElementById('back-to-top');
@@ -3777,6 +4207,9 @@ async function init() {
   // Apply text-only mode if was enabled
   if (state.textOnlyMode) document.body.classList.add('text-only-mode');
 
+  // #1 Show onboarding for first-time users
+  if (!state.onboarded) showOnboarding();
+
   // #3 Auto dark theme by time (check every 10 min)
   applyAutoTheme();
   setInterval(applyAutoTheme, 10 * 60 * 1000);
@@ -3804,6 +4237,13 @@ window.toggleBookmark = toggleBookmark;
 window.searchTag = searchTag;
 window.clearViewed = clearViewed;
 window.loadAll = loadAll;
+window.setModalFontSize = setModalFontSize;
+window.translateArticle = translateArticle;
+window.generateDigest = generateDigest;
+window.toggleReadAllMode = toggleReadAllMode;
+window.fetchWeatherByGeo = fetchWeatherByGeo;
+window.toggleTextOnlyMode = toggleTextOnlyMode;
+window.toggleKbdHelp = toggleKbdHelp;
 </script>
 </body>
 </html>
