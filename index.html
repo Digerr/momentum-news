@@ -102,42 +102,6 @@ input { font: inherit; }
   --cat-incidents: #f87171;
   --cat-wc2026: #4ade80;
 }
-[data-theme="sunset"] {
-  --brand: #c2410c;
-  --brand-2: #ea580c;
-  --brand-soft: rgba(194, 65, 12, 0.08);
-  --bg: #fafaf9;
-  --bg-2: #ffffff;
-  --bg-3: #f5f5f4;
-  --fg: #1c1917;
-  --fg-2: #57534e;
-  --fg-3: #a8a29e;
-  --border: #e7e5e4;
-  --border-2: #d6d3d1;
-  --card: #ffffff;
-  --shadow: 0 4px 12px rgba(0,0,0,.06);
-  --shadow-lg: 0 10px 30px rgba(0,0,0,.10);
-  --emerald: #10b981;
-  --rose: #e11d48;
-}
-[data-theme="ocean"] {
-  --brand: #0369a1;
-  --brand-2: #0284c7;
-  --brand-soft: rgba(3, 105, 161, 0.08);
-  --bg: #fafafa;
-  --bg-2: #ffffff;
-  --bg-3: #f4f4f5;
-  --fg: #0c0a09;
-  --fg-2: #44403c;
-  --fg-3: #a8a29e;
-  --border: #e7e5e4;
-  --border-2: #d6d3d1;
-  --card: #ffffff;
-  --shadow: 0 4px 12px rgba(0,0,0,.06);
-  --shadow-lg: 0 10px 30px rgba(0,0,0,.10);
-  --emerald: #10b981;
-  --rose: #e11d48;
-}
 
 /* ============ LAYOUT ============ */
 .app { display: flex; flex-direction: column; min-height: 100vh; max-width: 100vw; }
@@ -230,8 +194,9 @@ input { font: inherit; }
 .icon-btn.hidden-sm { display: none; }
 @media (min-width: 1024px) { .icon-btn.hidden-sm { display: grid; } }
 
-/* Mobile category strip */
-.mobile-strip { border-top: 1px solid var(--border); background: var(--bg); overflow-x: auto; -webkit-overflow-scrolling: touch; }
+/* Mobile category strip — matches header transparency for visual consistency */
+.mobile-strip { border-top: 1px solid var(--border); background: rgba(250, 250, 250, 0.80); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); overflow-x: auto; -webkit-overflow-scrolling: touch; }
+[data-theme="dark"] .mobile-strip { background: rgba(10, 10, 11, 0.80); }
 @media (min-width: 1024px) { .mobile-strip { display: none; } }
 .mobile-strip .container { display: flex; align-items: center; gap: 8px; padding-top: 8px; padding-bottom: 8px; }
 .mobile-strip .live-count { font-size: 11px; color: var(--fg-2); display: inline-flex; align-items: center; gap: 5px; flex-shrink: 0; font-weight: 600; }
@@ -975,8 +940,6 @@ body.read-all-mode .feed-wrap { grid-template-columns: 1fr !important; }
 .theme-swatch { width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0; border: 1px solid rgba(0,0,0,.1); background-size: 100% 100%; }
 .theme-swatch-light { background: linear-gradient(135deg, #ffffff 50%, #dc2626 50%); }
 .theme-swatch-dark { background: linear-gradient(135deg, #161618 50%, #dc2626 50%); }
-.theme-swatch-sunset { background: linear-gradient(135deg, #fafaf9 50%, #c2410c 50%); }
-.theme-swatch-ocean { background: linear-gradient(135deg, #fafafa 50%, #0369a1 50%); }
 .theme-option .name { font-size: 13px; font-weight: 500; }
 
 /* ============ TOAST ============ */
@@ -988,19 +951,11 @@ body.read-all-mode .feed-wrap { grid-template-columns: 1fr !important; }
 @keyframes toastIn { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
 /* ============ THEME TOGGLE ICON ============ */
-.theme-icon-sun, .theme-icon-moon, .theme-icon-palette { transition: transform .3s, opacity .3s; }
+.theme-icon-sun, .theme-icon-moon { transition: transform .3s, opacity .3s; }
 [data-theme="dark"] .theme-icon-sun { display: block; }
 [data-theme="dark"] .theme-icon-moon { display: none; }
-[data-theme="dark"] .theme-icon-palette { display: none; }
 [data-theme="light"] .theme-icon-sun { display: none; }
 [data-theme="light"] .theme-icon-moon { display: block; }
-[data-theme="light"] .theme-icon-palette { display: none; }
-[data-theme="sunset"] .theme-icon-sun { display: none; }
-[data-theme="sunset"] .theme-icon-moon { display: none; }
-[data-theme="sunset"] .theme-icon-palette { display: block; }
-[data-theme="ocean"] .theme-icon-sun { display: none; }
-[data-theme="ocean"] .theme-icon-moon { display: none; }
-[data-theme="ocean"] .theme-icon-palette { display: block; }
 
 /* ============ FONTS ============ */
 .playfair-fallback { font-family: Georgia, 'Times New Roman', serif; }
@@ -1076,7 +1031,6 @@ body.in-telegram .footer { display: none; }
           <button class="icon-btn" id="theme-toggle" aria-label="Сменить тему">
             <svg class="theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
             <svg class="theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
-            <svg class="theme-icon-palette" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
           </button>
           <div class="popover" id="theme-popover">
             <div class="popover-title">Тема оформления</div>
@@ -1088,14 +1042,6 @@ body.in-telegram .footer { display: none; }
               <button class="theme-option" data-theme="dark">
                 <span class="theme-swatch theme-swatch-dark"></span>
                 <span class="name">Тёмная</span>
-              </button>
-              <button class="theme-option" data-theme="sunset">
-                <span class="theme-swatch theme-swatch-sunset"></span>
-                <span class="name">Закат</span>
-              </button>
-              <button class="theme-option" data-theme="ocean">
-                <span class="theme-swatch theme-swatch-ocean"></span>
-                <span class="name">Океан</span>
               </button>
             </div>
           </div>
@@ -1335,7 +1281,7 @@ body.in-telegram .footer { display: none; }
         <span>Горячие клавиши</span>
         <span class="arrow">?</span>
       </button>
-      <button class="menu-item" id="menu-install-app" style="display:none;">
+      <button class="menu-item" id="menu-install-app">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         <span>Установить приложение</span>
       </button>
@@ -3397,7 +3343,7 @@ async function loadAll(force) {
 
 // #3 Auto dark theme by time
 function applyAutoTheme() {
-  if (state.theme === 'sunset' || state.theme === 'ocean') return; // skip custom themes
+  // Only light/dark themes exist now — no special-cased custom themes
   const hour = new Date().getHours();
   const shouldBeDark = hour >= 19 || hour < 7;
   const isDark = state.theme === 'dark';
@@ -4184,28 +4130,31 @@ function setupEvents() {
   });
 
   // PWA install
+  // The install button in the menu is ALWAYS visible (per user request).
+  // beforeinstallprompt is captured so clicking the button can trigger the native prompt.
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     state.deferredPrompt = e;
-    // Show install button in menu
-    document.getElementById('menu-install-app').style.display = 'flex';
     if (!state.dismissedPWA) {
       setTimeout(() => document.getElementById('pwa-banner').classList.add('show'), 5000);
     }
   });
-  // Menu install button
+  // Menu install button — always visible, falls back to instructions if no native prompt
   document.getElementById('menu-install-app').onclick = async () => {
     closeMenuDrawer();
     if (state.deferredPrompt) {
       state.deferredPrompt.prompt();
       const { outcome } = await state.deferredPrompt.userChoice;
       state.deferredPrompt = null;
-      document.getElementById('menu-install-app').style.display = 'none';
       document.getElementById('pwa-banner').classList.remove('show');
       if (outcome === 'accepted') toast('Приложение установлено!', 'success');
     } else {
-      // Fallback: show instructions
-      toast('Откройте меню браузера → «Установить приложение»', 'success');
+      // Fallback: show instructions (iOS Safari, desktop browsers without beforeinstallprompt)
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      const msg = isIOS
+        ? 'Нажмите «Поделиться» → «На экран Домой»'
+        : 'Откройте меню браузера → «Установить приложение»';
+      toast(msg, 'success');
     }
   };
   document.getElementById('pwa-install').onclick = async () => {
@@ -4323,18 +4272,15 @@ function setupTelegramWebApp(tg) {
     tg.expand();
     // Mark body as in-telegram
     document.body.classList.add('in-telegram');
-    // Apply Telegram theme if user hasn't picked a custom theme
+    // Only light/dark themes exist; always sync with Telegram theme
     const params = tg.themeParams || {};
-    const hasCustomTheme = state.theme === 'sunset' || state.theme === 'ocean';
-    if (!hasCustomTheme) {
-      // If Telegram is in dark mode, use our dark; otherwise light
-      if (params.bg_color && isColorDark(params.bg_color)) {
-        state.theme = 'dark';
-        applyTheme();
-      } else if (params.bg_color) {
-        state.theme = 'light';
-        applyTheme();
-      }
+    // If Telegram is in dark mode, use our dark; otherwise light
+    if (params.bg_color && isColorDark(params.bg_color)) {
+      state.theme = 'dark';
+      applyTheme();
+    } else if (params.bg_color) {
+      state.theme = 'light';
+      applyTheme();
     }
     // Set theme color for Telegram header
     if (tg.setHeaderColor) {
@@ -4347,15 +4293,13 @@ function setupTelegramWebApp(tg) {
     // Listen for theme changes
     tg.onEvent('themeChanged', () => {
       const p = tg.themeParams || {};
-      const hasCustomThemeNow = state.theme === 'sunset' || state.theme === 'ocean';
-      if (!hasCustomThemeNow) {
-        if (p.bg_color && isColorDark(p.bg_color)) {
-          state.theme = 'dark';
-        } else if (p.bg_color) {
-          state.theme = 'light';
-        }
-        applyTheme();
+      // Always sync with Telegram theme changes
+      if (p.bg_color && isColorDark(p.bg_color)) {
+        state.theme = 'dark';
+      } else if (p.bg_color) {
+        state.theme = 'light';
       }
+      applyTheme();
     });
     // Back button handling
     tg.onEvent('backButtonClicked', () => {
