@@ -1,0 +1,34 @@
+name: MOMENTUM Auto-Post
+
+on:
+  schedule:
+    # Every hour at minute 0
+    - cron: '0 * * * *'
+  workflow_dispatch: # Manual trigger
+
+jobs:
+  post-news:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Fetch and post news
+        env:
+          BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          CHANNEL_ID: '@momentum_newss'
+        run: python scripts/auto_post.py
+
+      - name: Commit posted articles log
+        run: |
+          git config user.name "MOMENTUM Bot"
+          git config user.email "bot@momentum.news"
+          git add scripts/posted_articles.json || true
+          git commit -m "chore: update posted articles log" || true
+          git push || true
