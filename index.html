@@ -1405,6 +1405,9 @@ body.in-telegram .footer { display: none; }
 // ---------- CONFIG ----------
 const SOURCES = [
   { id: 'lenta', name: 'Lenta.ru', url: 'https://lenta.ru', rss: 'https://lenta.ru/rss', favicon: 'https://www.google.com/s2/favicons?domain=lenta.ru&sz=64' },
+  { id: 'lentasport', name: 'Lenta Спорт', url: 'https://lenta.ru', rss: 'https://lenta.ru/rss/news/sport/', favicon: 'https://www.google.com/s2/favicons?domain=lenta.ru&sz=64' },
+  { id: 'lentaculture', name: 'Lenta Культура', url: 'https://lenta.ru', rss: 'https://lenta.ru/rss/news/culture/', favicon: 'https://www.google.com/s2/favicons?domain=lenta.ru&sz=64' },
+  { id: 'lentascience', name: 'Lenta Наука', url: 'https://lenta.ru', rss: 'https://lenta.ru/rss/news/science/', favicon: 'https://www.google.com/s2/favicons?domain=lenta.ru&sz=64' },
   { id: 'ria', name: 'РИА Новости', url: 'https://ria.ru', rss: 'https://ria.ru/export/rss2/archive/index.xml', favicon: 'https://www.google.com/s2/favicons?domain=ria.ru&sz=64' },
   { id: 'habr', name: 'Хабр', url: 'https://habr.com', rss: 'https://habr.com/ru/rss/articles/top/?fl=ru', favicon: 'https://www.google.com/s2/favicons?domain=habr.com&sz=64' },
   { id: 'vedomosti', name: 'Ведомости', url: 'https://www.vedomosti.ru', rss: 'https://www.vedomosti.ru/rss/news', favicon: 'https://www.google.com/s2/favicons?domain=vedomosti.ru&sz=64' },
@@ -1413,6 +1416,10 @@ const SOURCES = [
   { id: 'threednews', name: '3DNews', url: 'https://3dnews.ru', rss: 'https://3dnews.ru/news/rss/', favicon: 'https://www.google.com/s2/favicons?domain=3dnews.ru&sz=64' },
   { id: 'vcru', name: 'VC.ru', url: 'https://vc.ru', rss: 'https://vc.ru/rss/all', favicon: 'https://www.google.com/s2/favicons?domain=vc.ru&sz=64' },
   { id: 'naukatv', name: 'Наука.тв', url: 'https://naukatv.ru', rss: 'https://naukatv.ru/rss', favicon: 'https://www.google.com/s2/favicons?domain=naukatv.ru&sz=64' },
+  { id: 'nakedscience', name: 'Naked Science', url: 'https://naked-science.ru', rss: 'https://naked-science.ru/feed', favicon: 'https://www.google.com/s2/favicons?domain=naked-science.ru&sz=64' },
+  { id: 'nplus1', name: 'N+1', url: 'https://nplus1.ru', rss: 'https://nplus1.ru/rss', favicon: 'https://www.google.com/s2/favicons?domain=nplus1.ru&sz=64' },
+  { id: 'matchtv', name: 'Матч ТВ', url: 'https://matchtv.ru', rss: 'https://matchtv.ru/news/rss', favicon: 'https://www.google.com/s2/favicons?domain=matchtv.ru&sz=64' },
+  { id: 'tass', name: 'ТАСС', url: 'https://tass.ru', rss: 'https://tass.ru/rss/v2.xml', favicon: 'https://www.google.com/s2/favicons?domain=tass.ru&sz=64' },
   { id: 'bbcru', name: 'BBC Russian', url: 'https://www.bbc.com/russian', rss: 'https://feeds.bbci.co.uk/russian/rss.xml', favicon: 'https://www.google.com/s2/favicons?domain=bbc.com&sz=64' },
 ];
 
@@ -1757,6 +1764,14 @@ async function fetchRSS(source) {
       if (source.id === 'stopgame' && (category === 'Общество' || !catRaw)) category = 'Игры';
       // For science-specific sources, force category to Наука
       if (source.id === 'naukatv' && (category === 'Общество' || !catRaw)) category = 'Наука';
+      if (source.id === 'nakedscience') category = 'Наука';
+      if (source.id === 'nplus1') category = 'Наука';
+      if (source.id === 'lentascience') category = 'Наука';
+      // For sport-specific sources, force category to Спорт (ЧМ 2026 takes precedence below)
+      if (source.id === 'matchtv') category = 'Спорт';
+      if (source.id === 'lentasport') category = 'Спорт';
+      // For culture-specific sources, force category to Культура
+      if (source.id === 'lentaculture') category = 'Культура';
       // English sources → map categories
       if (source.needsTranslation) {
         const enCat = (catRaw || '').toLowerCase();
@@ -1767,9 +1782,10 @@ async function fetchRSS(source) {
         else if (enCat.includes('world') || enCat.includes('politic')) category = 'Мир';
         else category = 'Технологии';
       }
-      // Smart keyword filter: ЧМ 2026
+      // Smart keyword filter: ЧМ 2026 (FIFA World Cup 2026)
+      // Matches Russian and English keywords, country names playing, group stage, etc.
       const titleLower = rawTitle.toLowerCase();
-      if (/(чм[-\s]?2026|чемпионат мира 2026|мундиаль|мундиа[лль]|сборная.{0,20}(футбол|матч|игра)|футбол.{0,20}(чм|чемпионат мира|сборная))|чм[-\s]?по[-\s]?футболу|world cup 2026|wc 2026|fifa/i.test(titleLower)) {
+      if (/(чм[-\s]?2026|чемпионат мира 2026|чемпионат мира по футболу|мундиаль|мундиа[лль]|world cup 2026|wc 2026|fifa|чм[-\s]?по[-\s]?футболу|сборная.{0,15}(сша|мексики|канады|росси|украин|бразил|аргентин|франц|герман|испан|португал|англ|итал|нидерланд|хорват|япон|южн.{0,5}коре|марокко|сенегал|египет|тунис|иран|саудов|узбекистан|катар))/.test(titleLower)) {
         category = 'ЧМ 2026';
       }
       const author = stripHtml(getTag('author') || getTag('dc\\:creator') || getTag('creator')) || source.name;

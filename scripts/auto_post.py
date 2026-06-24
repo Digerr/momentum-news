@@ -18,6 +18,9 @@ API = f'https://api.telegram.org/bot{BOT_TOKEN}'
 # RSS sources (same as website)
 SOURCES = [
     ('Lenta.ru', 'https://lenta.ru/rss', 'https://www.google.com/s2/favicons?domain=lenta.ru&sz=64'),
+    ('Lenta Спорт', 'https://lenta.ru/rss/news/sport/', 'https://www.google.com/s2/favicons?domain=lenta.ru&sz=64'),
+    ('Lenta Культура', 'https://lenta.ru/rss/news/culture/', 'https://www.google.com/s2/favicons?domain=lenta.ru&sz=64'),
+    ('Lenta Наука', 'https://lenta.ru/rss/news/science/', 'https://www.google.com/s2/favicons?domain=lenta.ru&sz=64'),
     ('РИА Новости', 'https://ria.ru/export/rss2/archive/index.xml', 'https://www.google.com/s2/favicons?domain=ria.ru&sz=64'),
     ('Хабр', 'https://habr.com/ru/rss/articles/top/?fl=ru', 'https://www.google.com/s2/favicons?domain=habr.com&sz=64'),
     ('Ведомости', 'https://www.vedomosti.ru/rss/news', 'https://www.google.com/s2/favicons?domain=vedomosti.ru&sz=64'),
@@ -26,6 +29,10 @@ SOURCES = [
     ('3DNews', 'https://3dnews.ru/news/rss/', 'https://www.google.com/s2/favicons?domain=3dnews.ru&sz=64'),
     ('VC.ru', 'https://vc.ru/rss/all', 'https://www.google.com/s2/favicons?domain=vc.ru&sz=64'),
     ('Наука.тв', 'https://naukatv.ru/rss', 'https://www.google.com/s2/favicons?domain=naukatv.ru&sz=64'),
+    ('Naked Science', 'https://naked-science.ru/feed', 'https://www.google.com/s2/favicons?domain=naked-science.ru&sz=64'),
+    ('N+1', 'https://nplus1.ru/rss', 'https://www.google.com/s2/favicons?domain=nplus1.ru&sz=64'),
+    ('Матч ТВ', 'https://matchtv.ru/news/rss', 'https://www.google.com/s2/favicons?domain=matchtv.ru&sz=64'),
+    ('ТАСС', 'https://tass.ru/rss/v2.xml', 'https://www.google.com/s2/favicons?domain=tass.ru&sz=64'),
     ('BBC Russian', 'https://feeds.bbci.co.uk/russian/rss.xml', 'https://www.google.com/s2/favicons?domain=bbc.com&sz=64'),
 ]
 
@@ -78,6 +85,86 @@ def map_category(raw):
         if k.lower() in raw.lower():
             return v
     return 'Общество'
+
+# Stop words for keyword extraction (Russian)
+STOP_WORDS = set('в на с по и а но или что для от до из к у о об при за как так это тот этот был была были быть не ни же ли бы только уже ещё все всех весь вся они он она мы вы я его её их наш ваш свой который которая которые год года лет день дня время времени человек людей стал стала стали может можно нужно должен после перед через без над под между около во со то неё него ними ими вас нас себя себе собой этом этих эти таких такой такое такая'.split())
+
+def normalize_title(s):
+    """Lowercase, strip punctuation/whitespace — same as PWA."""
+    if not s:
+        return ''
+    import re as _re
+    return _re.sub(r'\s+', ' ', _re.sub(r'[«»""\'\.\!,\?;:\(\)\[\]\{\}\-–—_/\\|]', ' ', s.lower())).strip()
+
+def extract_keywords(s):
+    """Extract meaningful words (length > 3, not stop words)."""
+    return [w for w in normalize_title(s).split() if len(w) > 3 and w not in STOP_WORDS]
+
+def jaccard_similarity(a, b):
+    """Jaccard similarity on keyword sets (0..1)."""
+    sa = set(extract_keywords(a))
+    sb = set(extract_keywords(b))
+    if not sa or not sb:
+        return 0.0
+    return len(sa & sb) / len(sa | sb)
+
+def levenshtein(a, b):
+    """Levenshtein distance between two strings."""
+    m, n = len(a), len(b)
+    if m == 0: return n
+    if n == 0: return m
+    dp = list(range(n + 1))
+    for i in range(1, m + 1):
+        prev = dp[0]
+        dp[0] = i
+        for j in range(1, n + 1):
+            cur = dp[j]
+            dp[j] = min(dp[j] + 1, dp[j-1] + 1, prev + (0 if a[i-1] == b[j-1] else 1))
+            prev = cur
+    return dp[n]
+
+def title_similarity(a, b):
+    """Combined similarity ratio (0..1) — max of Jaccard and Levenshtein-based."""
+    na = normalize_title(a)
+    nb = normalize_title(b)
+    if not na or not nb: return 0.0
+    if na == nb: return 1.0
+    # First-60-chars match → 0.95
+    if na[:60] == nb[:60]: return 0.95
+    jac = jaccard_similarity(a, b)
+    sa, sb = na[:80], nb[:80]
+    dist = levenshtein(sa, sb)
+    max_len = max(len(sa), len(sb))
+    lev = 0 if max_len == 0 else 1 - (dist / max_len)
+    return max(jac, lev)
+
+def deduplicate_articles(articles, threshold=0.7):
+    """Deduplicate by title similarity. Keep the more recent article on conflict."""
+    kept = []
+    for a in articles:
+        is_dup = False
+        for k in kept:
+            sim = title_similarity(a['title'], k['title'])
+            if sim >= threshold:
+                is_dup = True
+                # Replace if newer
+                if a['published_at'] > k['published_at']:
+                    kept[kept.index(k)] = a
+                break
+        if not is_dup:
+            kept.append(a)
+    return kept
+
+# ЧМ 2026 keyword regex — matches same patterns as the PWA
+import re as _re_wc
+WC_2026_RE = _re_wc.compile(
+    r'(чм[-\s]?2026|чемпионат мира 2026|чемпионат мира по футболу|мундиаль|мундиа[лль]'
+    r'|world cup 2026|wc 2026|fifa|чм[-\s]?по[-\s]?футболу'
+    r'|сборная.{0,15}(сша|мексики|канады|росси|украин|бразил|аргентин|франц|герман|испан'
+    r'|португал|англ|итал|нидерланд|хорват|япон|южн.{0,5}коре|марокко|сенегал|египет'
+    r'|тунис|иран|саудов|узбекистан|катар))',
+    _re_wc.IGNORECASE
+)
 
 def time_ago(iso_str):
     try:
@@ -170,10 +257,18 @@ def fetch_rss(source_name, rss_url, favicon_url):
                 if m:
                     image = m.group(1)
 
-            # ЧМ 2026 keyword filter
-            title_lower = title.lower()
-            if re.search(r'чм[-\s]?2026|чемпионат мира 2026|мундиаль', title_lower):
+            # ЧМ 2026 keyword filter (expanded — same patterns as the PWA)
+            if WC_2026_RE.search(title):
                 category = 'ЧМ 2026'
+
+            # Force-category rules for new sources (mirrors the PWA logic)
+            if 'Lenta Спорт' in source_name or source_name == 'Матч ТВ':
+                if category not in ('ЧМ 2026',):
+                    category = 'Спорт'
+            elif source_name == 'Lenta Культура':
+                category = 'Культура'
+            elif source_name in ('Lenta Наука', 'Naked Science', 'N+1'):
+                category = 'Наука'
 
             articles.append({
                 'title': title,
@@ -315,19 +410,8 @@ def main():
     # Filter out already posted
     new_articles = [a for a in all_articles if a['title'] not in posted]
 
-    # Also deduplicate by similar titles
-    seen_titles = []
-    unique = []
-    for a in new_articles:
-        is_dup = False
-        for seen in seen_titles:
-            # Simple: if first 40 chars match
-            if a['title'][:40].lower() == seen[:40].lower():
-                is_dup = True
-                break
-        if not is_dup:
-            unique.append(a)
-            seen_titles.append(a['title'])
+    # Smart deduplicate by similar titles (Jaccard + Levenshtein, like the PWA does)
+    unique = deduplicate_articles(new_articles)
 
     # Prioritize articles with images
     with_images = [a for a in unique if a['image']]
