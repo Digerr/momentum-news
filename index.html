@@ -367,6 +367,11 @@ main { flex: 1; padding: 24px 0 48px; }
 .card:hover .card-bm { opacity: 1; }
 .card-bm.active { opacity: 1; background: var(--cat-color); }
 .card-bm svg { width: 14px; height: 14px; }
+.card-menu-btn { position: absolute; bottom: 10px; left: 10px; width: 28px; height: 28px; border-radius: 50%; background: rgba(0,0,0,0.5); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); display: grid; place-items: center; color: #fff; opacity: 0; transition: opacity .2s; z-index: 3; }
+.card:hover .card-menu-btn { opacity: 1; }
+.card-menu-btn svg { width: 14px; height: 14px; }
+.card-menu-btn-text { position: absolute; top: 16px; right: 50px; width: 28px; height: 28px; border-radius: 50%; background: var(--bg-3); display: grid; place-items: center; color: var(--fg-2); opacity: 0; transition: opacity .2s; }
+.card-text:hover .card-menu-btn-text { opacity: 1; }
 .card-body { padding: 18px; padding-top: 16px; display: flex; flex-direction: column; flex: 1; }
 .card-source { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--fg-2); font-weight: 700; margin-bottom: 8px; }
 .card-source img { width: 12px; height: 12px; border-radius: 2px; }
@@ -534,7 +539,7 @@ body.text-only-mode .card:not(.card-text) { border-top: 4px solid var(--cat-colo
 .geo-btn:hover { opacity: 0.7; }
 
 /* #32 Prefetch hint */
-article.card { contain: layout style; }
+article.card { contain: layout style; content-visibility: auto; contain-intrinsic-size: 400px; }
 
 /* #4 Read-all mode toggle */
 body.read-all-mode #hero { display: none; }
@@ -1292,8 +1297,9 @@ body.in-telegram .footer { display: none; }
         <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
       </a>
       <div style="padding: 12px; font-size: 12px; color: var(--fg-3); line-height: 1.5;">
-        <strong>MOMENTUM</strong> — современный независимый новостной портал. Свежие новости из 9 источников каждый час.<br><br>
-        Сделано с ❤️ на vanilla JS. © 2026
+        <strong>MOMENTUM</strong> — современный независимый новостной портал. Свежие новости из 12 источников каждый час.<br><br>
+        Single-file PWA · Vanilla JS · © 2026<br><br>
+        <span style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 6px; background: var(--brand-soft); color: var(--brand); font-weight: 700; font-size: 13px;">Designed by SKUFI4</span>
       </div>
     </div>
   </div>
@@ -1746,7 +1752,7 @@ async function fetchRSS(source) {
   if (!xml) { console.warn('RSS failed for', source.id, lastErr); return []; }
   try {
     const doc = new DOMParser().parseFromString(xml, 'text/xml');
-    const items = Array.from(doc.querySelectorAll('item, entry')).slice(0, 25);
+    const items = Array.from(doc.querySelectorAll('item, entry')).slice(0, 15);
     return items.map(item => {
       const getTag = (tag) => {
         const el = item.querySelector(tag);
@@ -2212,6 +2218,7 @@ function renderGrid() {
           <button class="card-bm ${saved ? 'active' : ''}" onclick="event.stopPropagation(); toggleBookmark('${a.id}')" aria-label="Bookmark">
             <svg viewBox="0 0 24 24" fill="${saved ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
           </button>
+          <button class="card-menu-btn" onclick="cardMenuClick(event, '${a.id}')" aria-label="Меню"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button>
         </div>
         <div class="card-body">
           <div class="card-source"><img src="${a.source.favicon}" alt="">${a.source.name}${isNew(a) ? '<span class="new-badge">Новое</span>' : ''}<span class="time">${timeAgo(a.publishedAt)}</span></div>
@@ -2244,6 +2251,7 @@ function renderGrid() {
         <button class="card-bm card-bm-text ${saved ? 'active' : ''}" onclick="event.stopPropagation(); toggleBookmark('${a.id}')" aria-label="Bookmark">
           <svg viewBox="0 0 24 24" fill="${saved ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
         </button>
+        <button class="card-menu-btn card-menu-btn-text" onclick="cardMenuClick(event, '${a.id}')" aria-label="Меню"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button>
       </article>
       `;
     }
@@ -2617,13 +2625,13 @@ async function fetchMissingImages() {
   }
   if (updated) renderAll();
 
-  // Find articles still without image, limit to 15 to avoid hammering proxy
-  const needImg = state.articles.filter(a => !a.image && a.link && a.link !== a.source.url).slice(0, 15);
+  // Find articles still without image, limit to 8 to avoid hammering proxy
+  const needImg = state.articles.filter(a => !a.image && a.link && a.link !== a.source.url).slice(0, 8);
   if (needImg.length === 0) return;
 
-  // Process in batches of 3
-  for (let i = 0; i < needImg.length; i += 3) {
-    const batch = needImg.slice(i, i + 3);
+  // Process in batches of 2
+  for (let i = 0; i < needImg.length; i += 2) {
+    const batch = needImg.slice(i, i + 2);
     await Promise.allSettled(batch.map(a => fetchOgImage(a)));
     // Re-render after each batch so images appear progressively
     renderAll();
@@ -3198,8 +3206,9 @@ async function loadAll(force) {
     document.getElementById('loading').style.display = 'none';
     document.getElementById('content').style.display = 'block';
     renderAll();
-    // Background: fetch og:image for articles without photos
-    fetchMissingImages();
+    // Background: fetch og:image for articles without photos (non-blocking)
+    if ('requestIdleCallback' in window) requestIdleCallback(() => fetchMissingImages());
+    else setTimeout(fetchMissingImages, 1000);
   } catch (e) {
     console.error(e);
     document.getElementById('loading').style.display = 'none';
@@ -3440,32 +3449,14 @@ function showOnboarding() {
   document.getElementById('onboarding').classList.add('open');
 }
 
-// #2 Long-press + context menu
+// #2 Card menu button (replaces long-press to avoid text selection issues)
 let ctxArticleId = null;
-let longPressTimer = null;
-function setupLongPress() {
-  document.addEventListener('touchstart', (e) => {
-    const card = e.target.closest('#grid article, .hero-card, .hero-main');
-    if (!card) return;
-    const articleId = card.getAttribute('onclick')?.match(/'([^']+)'/)?.[1];
-    if (!articleId) return;
-    longPressTimer = setTimeout(() => {
-      ctxArticleId = articleId;
-      const touch = e.touches[0];
-      const menu = document.getElementById('ctx-menu');
-      menu.style.left = Math.min(touch.clientX, window.innerWidth - 210) + 'px';
-      menu.style.top = Math.min(touch.clientY, window.innerHeight - 200) + 'px';
-      menu.classList.add('open');
-      haptic('medium');
-    }, 500);
-  }, { passive: true });
-  document.addEventListener('touchend', () => { clearTimeout(longPressTimer); }, { passive: true });
-  document.addEventListener('touchmove', () => { clearTimeout(longPressTimer); }, { passive: true });
+function setupCardMenuButton() {
   // Close on click outside
   document.addEventListener('click', (e) => {
     const menu = document.getElementById('ctx-menu');
     if (!menu.classList.contains('open')) return;
-    if (!e.target.closest('.ctx-menu')) menu.classList.remove('open');
+    if (!e.target.closest('.ctx-menu') && !e.target.closest('.card-menu-btn')) menu.classList.remove('open');
   });
   // Context menu actions
   document.getElementById('ctx-open').onclick = () => { if (ctxArticleId) openArticle(ctxArticleId); document.getElementById('ctx-menu').classList.remove('open'); };
@@ -3490,6 +3481,23 @@ function setupLongPress() {
     document.getElementById('ctx-menu').classList.remove('open');
   };
 }
+// Called by card menu button onclick
+window.cardMenuClick = function(e, articleId) {
+  e.stopPropagation();
+  e.preventDefault();
+  ctxArticleId = articleId;
+  const menu = document.getElementById('ctx-menu');
+  const btn = e.currentTarget;
+  const rect = btn.getBoundingClientRect();
+  let left = rect.right - 200;
+  let top = rect.bottom + 4;
+  if (top + 200 > window.innerHeight) top = rect.top - 200;
+  if (left < 8) left = 8;
+  menu.style.left = left + 'px';
+  menu.style.top = top + 'px';
+  menu.classList.add('open');
+  haptic('light');
+};
 
 // #11 Swipe in modal (next/prev article)
 function setupModalSwipe() {
@@ -3898,7 +3906,7 @@ function setupEvents() {
   });
 
   // ===== NEW FEATURES =====
-  setupLongPress();
+  setupCardMenuButton();
   setupModalSwipe();
   setupBottomNav();
   setupPrefetch();
