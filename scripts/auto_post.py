@@ -28,9 +28,9 @@ SOURCES = [
 
 # Category emojis
 CAT_EMOJI = {
-    'Технологии': '💻', 'Бизнес': '📈', 'Наука': '🔬', 'Спорт': '⚽',
-    'Культура': '🎬', 'Мир': '🌍', 'Общество': '👥', 'Происшествия': '🚨',
-    'Игры': '🎮', 'ЧМ 2026': '🏆',
+    'Технологии': '📱', 'Бизнес': '💼', 'Наука': '🔬', 'Спорт': '🏃',
+    'Культура': '🎨', 'Мир': '🌐', 'Общество': '🏛️', 'Происшествия': '⚠️',
+    'Игры': '🕹️', 'ЧМ 2026': '🏆',
 }
 
 # Simple category mapping
@@ -217,8 +217,14 @@ def post_article(article):
     caption = f"{cat_emoji} <b>{title}</b>\n\n"
     if excerpt:
         caption += f"{excerpt}...\n\n"
-    caption += f"📡 <i>{article['source_name']}</i> · 🕒 {time_str}\n"
-    caption += f"🌐 <a href=\"https://digerr.github.io/momentum-news/\">Читать на MOMENTUM</a>"
+    caption += f"📡 <i>{article['source_name']}</i> · 🕒 {time_str}"
+
+    # Inline keyboard button to open MOMENTUM
+    reply_markup = {
+        'inline_keyboard': [[
+            {'text': 'MOMENTUM', 'url': 'https://t.me/momentum_newsbot/momentum'}
+        ]]
+    }
 
     try:
         if article['image']:
@@ -231,6 +237,7 @@ def post_article(article):
                     'caption': caption,
                     'parse_mode': 'HTML',
                     'link_preview_options': {'is_disabled': True},
+                    'reply_markup': reply_markup,
                 },
                 timeout=15
             )
@@ -243,6 +250,7 @@ def post_article(article):
                     'text': caption,
                     'parse_mode': 'HTML',
                     'link_preview_options': {'is_disabled': True},
+                    'reply_markup': reply_markup,
                 },
                 timeout=15
             )
@@ -261,6 +269,7 @@ def post_article(article):
                         'text': caption,
                         'parse_mode': 'HTML',
                         'link_preview_options': {'is_disabled': True},
+                        'reply_markup': reply_markup,
                     },
                     timeout=15
                 )
@@ -320,8 +329,8 @@ def main():
     with_images = [a for a in unique if a['image']]
     without_images = [a for a in unique if not a['image']]
 
-    # Pick top 3 (prefer with images)
-    to_post = (with_images + without_images)[:3]
+    # Pick top 5 (prefer with images)
+    to_post = (with_images + without_images)[:5]
 
     if not to_post:
         print('ℹ️ No new articles to post')
