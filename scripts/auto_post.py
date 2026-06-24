@@ -10,9 +10,9 @@ from datetime import datetime, timezone
 
 BOT_TOKEN = os.environ.get('BOT_TOKEN', '')
 CHANNEL_ID = os.environ.get('CHANNEL_ID', '@momentum_newss')
-# Direct HTTPS URL of the Mini App — opens directly when button clicked (no bot dialog)
-# Domain MUST be linked to the bot via @BotFather → /setdomain → add "digerr.github.io"
-WEB_APP_URL = os.environ.get('WEB_APP_URL', 'https://digerr.github.io/momentum-news/')
+# Mini App URL — opens directly in Telegram (no bot dialog shown)
+# Format: t.me/<bot_username>/<app_name> auto-opens the Mini App
+WEB_APP_URL = os.environ.get('WEB_APP_URL', 'https://t.me/momentum_newsbot/momentum')
 API = f'https://api.telegram.org/bot{BOT_TOKEN}'
 
 # RSS sources (same as website)
@@ -222,11 +222,11 @@ def post_article(article):
         caption += f"{excerpt}...\n\n"
     caption += f"📡 <i>{article['source_name']}</i> · 🕒 {time_str}"
 
-    # Inline keyboard button — opens Mini App DIRECTLY (no bot dialog)
-    # Uses 'web_app' type instead of 'url' so Telegram launches the Mini App right away
+    # Inline keyboard button — opens Mini App directly in Telegram
+    # Uses URL type with t.me/<bot>/<app> shortcut that auto-launches the Mini App
     reply_markup = {
         'inline_keyboard': [[
-            {'text': '⚡ Открыть MOMENTUM', 'web_app': {'url': WEB_APP_URL}}
+            {'text': '⚡ Открыть MOMENTUM', 'url': WEB_APP_URL}
         ]]
     }
 
