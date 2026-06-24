@@ -75,6 +75,7 @@ input { font: inherit; }
   --cat-world: #dc2626;
   --cat-society: #f97316;
   --cat-incidents: #991b1b;
+  --cat-wc2026: #16a34a;
 }
 [data-theme="dark"] {
   --bg: #0a0a0b;
@@ -99,6 +100,7 @@ input { font: inherit; }
   --cat-world: #f87171;
   --cat-society: #fb923c;
   --cat-incidents: #f87171;
+  --cat-wc2026: #4ade80;
 }
 [data-theme="sunset"] {
   --brand: #c2410c;
@@ -195,6 +197,13 @@ input { font: inherit; }
 .nav-item[data-cat="Мир"] { --cat-color: var(--cat-world); }
 .nav-item[data-cat="Общество"] { --cat-color: var(--cat-society); }
 .nav-item[data-cat="Происшествия"] { --cat-color: var(--cat-incidents); }
+.nav-item[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
+.modal-related-item[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
+.bm-card[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
+.modal-img[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
+.hero-card[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
+.hero-main[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
+.card[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
 .nav-item::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--cat-color); opacity: 0.5; transition: opacity .2s; }
 .nav-item.active::before { opacity: 1; }
 .nav-item:hover { color: var(--fg); }
@@ -238,6 +247,13 @@ input { font: inherit; }
 .chip[data-cat="Мир"] { --cat-color: var(--cat-world); }
 .chip[data-cat="Общество"] { --cat-color: var(--cat-society); }
 .chip[data-cat="Происшествия"] { --cat-color: var(--cat-incidents); }
+.chip[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
+.modal-related-item[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
+.bm-card[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
+.modal-img[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
+.hero-card[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
+.hero-main[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
+.card[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
 .chip.active { background: var(--fg); color: var(--bg); }
 .chip.active::before { background: var(--cat-color, var(--brand)); box-shadow: 0 0 0 2px var(--fg); }
 .chip .count { opacity: 0.6; font-size: 10px; margin-left: 2px; }
@@ -264,6 +280,12 @@ main { flex: 1; padding: 24px 0 48px; }
 .hero-main[data-cat="Мир"] { --cat-color: var(--cat-world); }
 .hero-main[data-cat="Общество"] { --cat-color: var(--cat-society); }
 .hero-main[data-cat="Происшествия"] { --cat-color: var(--cat-incidents); }
+.modal-related-item[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
+.bm-card[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
+.modal-img[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
+.hero-card[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
+.hero-main[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
+.card[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
 .hero-main:hover { transform: translateY(-3px); }
 @media (min-width: 768px) { .hero-main { aspect-ratio: 16/10; } }
 .hero-main img { width: 100%; height: 100%; object-fit: cover; transition: transform .7s; }
@@ -303,6 +325,12 @@ main { flex: 1; padding: 24px 0 48px; }
 .hero-card[data-cat="Мир"] { --cat-color: var(--cat-world); }
 .hero-card[data-cat="Общество"] { --cat-color: var(--cat-society); }
 .hero-card[data-cat="Происшествия"] { --cat-color: var(--cat-incidents); }
+.modal-related-item[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
+.bm-card[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
+.modal-img[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
+.hero-card[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
+.hero-main[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
+.card[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
 .hero-card:hover { border-color: var(--cat-color); transform: translateX(2px); }
 @media (min-width: 768px) { .hero-card { gap: 16px; padding: 16px; } }
 .hero-card-img { width: 80px; height: 80px; border-radius: 8px; object-fit: cover; flex-shrink: 0; background: var(--bg-3); }
@@ -352,6 +380,12 @@ main { flex: 1; padding: 24px 0 48px; }
 .card[data-cat="Мир"] { --cat-color: var(--cat-world); }
 .card[data-cat="Общество"] { --cat-color: var(--cat-society); }
 .card[data-cat="Происшествия"] { --cat-color: var(--cat-incidents); }
+.modal-related-item[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
+.bm-card[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
+.modal-img[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
+.hero-card[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
+.hero-main[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
+.card[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
 .card:hover { border-color: var(--cat-color); box-shadow: 0 4px 20px rgba(0,0,0,0.08); transform: translateY(-2px); }
 .card:hover .card-title { color: var(--cat-color); }
 .card-img-wrap { position: relative; aspect-ratio: 16/10; background: var(--bg-3); overflow: hidden; }
@@ -694,6 +728,12 @@ body.read-all-mode .feed-wrap { grid-template-columns: 1fr !important; }
 .modal-img[data-cat="Мир"] { --cat-color: var(--cat-world); }
 .modal-img[data-cat="Общество"] { --cat-color: var(--cat-society); }
 .modal-img[data-cat="Происшествия"] { --cat-color: var(--cat-incidents); }
+.modal-related-item[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
+.bm-card[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
+.modal-img[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
+.hero-card[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
+.hero-main[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
+.card[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
 .modal-img-placeholder { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; background: linear-gradient(135deg, var(--cat-color) 0%, color-mix(in srgb, var(--cat-color) 60%, var(--bg-3)) 100%); }
 .modal-img-placeholder .source-avatar { width: 96px; height: 96px; border-radius: 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.25); display: block; }
 .modal-img-placeholder .placeholder-cat { color: rgba(255,255,255,0.95); font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; text-shadow: 0 1px 4px rgba(0,0,0,0.3); }
@@ -767,6 +807,12 @@ body.read-all-mode .feed-wrap { grid-template-columns: 1fr !important; }
 .modal-related-item[data-cat="Мир"] { --cat-color: var(--cat-world); }
 .modal-related-item[data-cat="Общество"] { --cat-color: var(--cat-society); }
 .modal-related-item[data-cat="Происшествия"] { --cat-color: var(--cat-incidents); }
+.modal-related-item[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
+.bm-card[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
+.modal-img[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
+.hero-card[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
+.hero-main[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
+.card[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
 .modal-related-item:hover { background: var(--bg-3); }
 .modal-related-item img:not(.modal-related-img-placeholder img):not(.modal-related-source img) { width: 72px; height: 72px; border-radius: 6px; object-fit: cover; flex-shrink: 0; background: var(--bg-3); }
 .modal-related-img-placeholder { width: 72px; height: 72px; border-radius: 6px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--cat-color) 0%, color-mix(in srgb, var(--cat-color) 60%, var(--bg-3)) 100%); }
@@ -827,6 +873,12 @@ body.read-all-mode .feed-wrap { grid-template-columns: 1fr !important; }
 .bm-card[data-cat="Мир"] { --cat-color: var(--cat-world); }
 .bm-card[data-cat="Общество"] { --cat-color: var(--cat-society); }
 .bm-card[data-cat="Происшествия"] { --cat-color: var(--cat-incidents); }
+.modal-related-item[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
+.bm-card[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
+.modal-img[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
+.hero-card[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
+.hero-main[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
+.card[data-cat="ЧМ 2026"] { --cat-color: var(--cat-wc2026); }
 .bm-card-img-placeholder { width: 80px; height: 64px; border-radius: 8px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--cat-color, var(--brand)) 0%, color-mix(in srgb, var(--cat-color, var(--brand)) 60%, var(--bg-3)) 100%); }
 .bm-card-img-placeholder .source-avatar { width: 32px; height: 32px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.15); display: block; }
 .bm-card-body { flex: 1; min-width: 0; }
@@ -1435,9 +1487,11 @@ const SOURCES = [
   { id: 'nakedsci', name: 'Naked Science', url: 'https://naked-science.ru', rss: 'https://naked-science.ru/feed', favicon: 'https://www.google.com/s2/favicons?domain=naked-science.ru&sz=64' },
   { id: 'threednews', name: '3DNews', url: 'https://3dnews.ru', rss: 'https://3dnews.ru/news/rss/', favicon: 'https://www.google.com/s2/favicons?domain=3dnews.ru&sz=64' },
   { id: 'vcru', name: 'VC.ru', url: 'https://vc.ru', rss: 'https://vc.ru/rss/all', favicon: 'https://www.google.com/s2/favicons?domain=vc.ru&sz=64' },
+  { id: 'naukatv', name: 'Наука.тв', url: 'https://naukatv.ru', rss: 'https://naukatv.ru/rss', favicon: 'https://www.google.com/s2/favicons?domain=naukatv.ru&sz=64' },
+  { id: 'elementy', name: 'Элементы.ру', url: 'https://elementy.ru', rss: 'https://elementy.ru/rss/news', favicon: 'https://www.google.com/s2/favicons?domain=elementy.ru&sz=64' },
 ];
 
-const CATEGORIES = ['Все', 'Технологии', 'Бизнес', 'Наука', 'Спорт', 'Культура', 'Мир', 'Общество', 'Происшествия', 'Игры'];
+const CATEGORIES = ['Все', 'Технологии', 'Бизнес', 'Наука', 'Спорт', 'ЧМ 2026', 'Культура', 'Мир', 'Общество', 'Происшествия', 'Игры'];
 
 const CATEGORY_MAP = {
   'Технологии и Интернет': 'Технологии', 'Технологии': 'Технологии', 'Интернет': 'Технологии',
@@ -1476,6 +1530,12 @@ const CATEGORY_MAP = {
   'Стартапы': 'Бизнес', 'Маркетинг': 'Бизнес', 'Дизайн': 'Культура',
   'Разработка': 'Технологии', 'Карьера': 'Бизнес', 'Истории бизнеса': 'Бизнес',
   'Гаджеты': 'Технологии', 'Искусственный интеллект': 'Технологии',
+  // Lenta culture categories
+  'Ценности': 'Культура', 'Кино': 'Культура', 'Музыка': 'Культура', 'Театр': 'Культура',
+  'Литература': 'Культура', 'Мода': 'Культура', 'Знаменитости': 'Культура',
+  'Шоу-бизнес': 'Культура', 'Медиа': 'Культура', 'Путешествия': 'Культура',
+  'Из жизни': 'Культура', 'Забота о себе': 'Культура',
+  'Интернет и СМИ': 'Технологии',
 };
 
 const I18N = {
@@ -1770,6 +1830,13 @@ async function fetchRSS(source) {
       let category = mapCategory(catRaw);
       // For game-specific sources, force category to Игры
       if (source.id === 'stopgame' && (category === 'Общество' || !catRaw)) category = 'Игры';
+      // For science-specific sources, force category to Наука
+      if ((source.id === 'naukatv' || source.id === 'elementy') && (category === 'Общество' || !catRaw)) category = 'Наука';
+      // Smart keyword filter: ЧМ 2026 (overrides Спорт if football/ЧМ keywords in title)
+      const titleLower = title.toLowerCase();
+      if (/(чм[-\s]?2026|чемпионат мира 2026|мундиаль|мундиа[лль]|сборная.{0,20}(футбол|матч|игра)|футбол.{0,20}(чм|чемпионат мира|сборная))|чм[-\s]?по[-\s]?футболу/i.test(title)) {
+        category = 'ЧМ 2026';
+      }
       const author = stripHtml(getTag('author') || getTag('dc\\:creator') || getTag('creator')) || source.name;
       const descRaw = getTag('description') || getTag('summary') || getTag('content\\:encoded') || '';
       const content = stripHtml(descRaw);
@@ -1842,9 +1909,26 @@ async function fetchAllNews() {
 function normalizeTitle(s) {
   return (s || '')
     .toLowerCase()
-    .replace(/[«»"'.!,?;:()\[\]{}\-–—]/g, ' ')
+    .replace(/[«»""''.!,?;:()\[\]{}\-–—_/\\|]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
+}
+
+// Stop words that should be ignored in similarity comparison
+const STOP_WORDS = new Set(['в','на','с','по','и','а','но','или','что','для','от','до','из','к','у','о','об','при','за','как','так','это','тот','этот','был','была','были','быть','не','ни','же','ли','бы','только','уже','ещё','все','всех','весь','вся','они','он','она','мы','вы','я','его','её','их','наш','ваш','свой','который','которая','которые','год','года','лет','день','дня','время','времени','человек','людей','стал','стала','стали','может','можно','нужно','должен','после','перед','через','без','при','над','под','между','около','во','со','то','неё','него','ними','ими','вас','нас','себя','себе','собой','этом','этих','эти','таких','такой','такое','такая']);
+// Extract meaningful words from title (remove stop words, keep words > 3 chars)
+function extractKeywords(s) {
+  return normalizeTitle(s).split(' ').filter(w => w.length > 3 && !STOP_WORDS.has(w));
+}
+// Jaccard similarity on keyword sets — better for news titles than Levenshtein
+function jaccardSimilarity(a, b) {
+  const setA = new Set(extractKeywords(a));
+  const setB = new Set(extractKeywords(b));
+  if (setA.size === 0 || setB.size === 0) return 0;
+  let intersection = 0;
+  for (const w of setA) { if (setB.has(w)) intersection++; }
+  const union = setA.size + setB.size - intersection;
+  return intersection / union;
 }
 
 // Compute similarity ratio of two normalized strings (0..1)
@@ -1857,12 +1941,16 @@ function titleSimilarity(a, b) {
   const a60 = na.slice(0, 60);
   const b60 = nb.slice(0, 60);
   if (a60 === b60) return 0.95;
-  // Levenshtein-based ratio (limited to first 80 chars for performance)
+  // Use Jaccard on keywords (better for news titles with same meaning, different words order)
+  const jac = jaccardSimilarity(a, b);
+  // Also use Levenshtein (catches typos and small edits)
   const sa = na.slice(0, 80);
   const sb = nb.slice(0, 80);
   const dist = levenshtein(sa, sb);
   const maxLen = Math.max(sa.length, sb.length);
-  return maxLen === 0 ? 0 : 1 - (dist / maxLen);
+  const lev = maxLen === 0 ? 0 : 1 - (dist / maxLen);
+  // Take the MAX of both — if either method says they're similar, treat as similar
+  return Math.max(jac, lev);
 }
 
 function levenshtein(a, b) {
@@ -1908,7 +1996,7 @@ function deduplicateArticles(articles) {
       for (const [key, entry] of map) {
         if (!key.startsWith('title:')) continue;
         const sim = titleSimilarity(a.title, entry.article.title);
-        if (sim >= 0.85) {
+        if (sim >= 0.55) {
           existingArticle = entry.article;
           break;
         }
