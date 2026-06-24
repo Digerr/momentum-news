@@ -160,8 +160,8 @@ input { font: inherit; }
 }
 
 /* ============ HEADER ============ */
-.header { position: sticky; top: 0; z-index: 50; background: rgba(250, 250, 250, 0.92); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid var(--border); padding-top: env(safe-area-inset-top); padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
-[data-theme="dark"] .header { background: rgba(10, 10, 11, 0.92); }
+.header { position: sticky; top: 0; z-index: 50; background: rgba(250, 250, 250, 0.80); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding-top: env(safe-area-inset-top); padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
+[data-theme="dark"] .header { background: rgba(10, 10, 11, 0.80); }
 .header .container { display: flex; align-items: center; gap: 6px; height: 56px; }
 @media (min-width: 768px) { .header .container { gap: 8px; height: 72px; } }
 
@@ -827,13 +827,13 @@ body.read-all-mode .feed-wrap { grid-template-columns: 1fr !important; }
 /* ============ DRAWER (Bookmarks) ============ */
 .drawer-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 90; opacity: 0; pointer-events: none; transition: opacity .25s; }
 .drawer-backdrop.open { opacity: 1; pointer-events: auto; }
-.drawer { position: fixed; top: 0; right: 0; bottom: 0; width: 100%; max-width: 420px; background: rgba(250, 250, 250, 0.92); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); z-index: 95; transform: translateX(100%); transition: transform .3s; display: flex; flex-direction: column; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); padding-right: env(safe-area-inset-right); }
-[data-theme="dark"] .drawer { background: rgba(10, 10, 11, 0.92); }
+.drawer { position: fixed; top: 0; right: 0; bottom: 0; width: 100%; max-width: 420px; background: rgba(250, 250, 250, 0.80); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); z-index: 95; transform: translateX(100%); transition: transform .3s; display: flex; flex-direction: column; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); padding-right: env(safe-area-inset-right); }
+[data-theme="dark"] .drawer { background: rgba(10, 10, 11, 0.80); }
 .drawer.open { transform: translateX(0); }
 
 /* ============ MENU DRAWER (Left) ============ */
-.menu-drawer { position: fixed; top: 0; left: 0; bottom: 0; width: 100%; max-width: 340px; background: rgba(250, 250, 250, 0.92); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); z-index: 95; transform: translateX(-100%); transition: transform .3s; display: flex; flex-direction: column; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); padding-left: env(safe-area-inset-left); }
-[data-theme="dark"] .menu-drawer { background: rgba(10, 10, 11, 0.92); }
+.menu-drawer { position: fixed; top: 0; left: 0; bottom: 0; width: 100%; max-width: 340px; background: rgba(250, 250, 250, 0.80); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); z-index: 95; transform: translateX(-100%); transition: transform .3s; display: flex; flex-direction: column; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); padding-left: env(safe-area-inset-left); }
+[data-theme="dark"] .menu-drawer { background: rgba(10, 10, 11, 0.80); }
 .menu-drawer.open { transform: translateX(0); }
 .menu-drawer-head { padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .menu-drawer-head .brand { display: flex; align-items: center; gap: 8px; font-family: 'Playfair Display', Georgia, serif; font-size: 20px; font-weight: 900; background: linear-gradient(90deg, var(--fg) 0%, var(--brand) 50%, var(--fg) 100%); background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; animation: text-shimmer 4s linear infinite; }
@@ -1334,6 +1334,10 @@ body.in-telegram .footer { display: none; }
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M6 12h.01M10 12h.01M14 12h.01M18 12h.01M7 16h10"/></svg>
         <span>Горячие клавиши</span>
         <span class="arrow">?</span>
+      </button>
+      <button class="menu-item" id="menu-install-app" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span>Установить приложение</span>
       </button>
     </div>
     <!-- Язык -->
@@ -4102,16 +4106,34 @@ function setupEvents() {
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     state.deferredPrompt = e;
+    // Show install button in menu
+    document.getElementById('menu-install-app').style.display = 'flex';
     if (!state.dismissedPWA) {
       setTimeout(() => document.getElementById('pwa-banner').classList.add('show'), 5000);
     }
   });
+  // Menu install button
+  document.getElementById('menu-install-app').onclick = async () => {
+    closeMenuDrawer();
+    if (state.deferredPrompt) {
+      state.deferredPrompt.prompt();
+      const { outcome } = await state.deferredPrompt.userChoice;
+      state.deferredPrompt = null;
+      document.getElementById('menu-install-app').style.display = 'none';
+      document.getElementById('pwa-banner').classList.remove('show');
+      if (outcome === 'accepted') toast('Приложение установлено!', 'success');
+    } else {
+      // Fallback: show instructions
+      toast('Откройте меню браузера → «Установить приложение»', 'success');
+    }
+  };
   document.getElementById('pwa-install').onclick = async () => {
     if (state.deferredPrompt) {
       state.deferredPrompt.prompt();
       const { outcome } = await state.deferredPrompt.userChoice;
       state.deferredPrompt = null;
       document.getElementById('pwa-banner').classList.remove('show');
+      document.getElementById('menu-install-app').style.display = 'none';
     }
   };
   document.getElementById('pwa-dismiss').onclick = () => {
