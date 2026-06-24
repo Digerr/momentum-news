@@ -1481,18 +1481,21 @@ body.in-telegram .footer { display: none; }
 // ---------- CONFIG ----------
 const SOURCES = [
   { id: 'lenta', name: 'Lenta.ru', url: 'https://lenta.ru', rss: 'https://lenta.ru/rss', favicon: 'https://www.google.com/s2/favicons?domain=lenta.ru&sz=64' },
-  { id: 'tass', name: 'ТАСС', url: 'https://tass.ru', rss: 'https://tass.ru/rss/v2.xml', favicon: 'https://www.google.com/s2/favicons?domain=tass.ru&sz=64' },
   { id: 'ria', name: 'РИА Новости', url: 'https://ria.ru', rss: 'https://ria.ru/export/rss2/archive/index.xml', favicon: 'https://www.google.com/s2/favicons?domain=ria.ru&sz=64' },
-  { id: 'kommersant', name: 'Коммерсантъ', url: 'https://www.kommersant.ru', rss: 'https://www.kommersant.ru/rss/news.xml', favicon: 'https://www.google.com/s2/favicons?domain=kommersant.ru&sz=64' },
   { id: 'habr', name: 'Хабр', url: 'https://habr.com', rss: 'https://habr.com/ru/rss/articles/top/?fl=ru', favicon: 'https://www.google.com/s2/favicons?domain=habr.com&sz=64' },
   { id: 'vedomosti', name: 'Ведомости', url: 'https://www.vedomosti.ru', rss: 'https://www.vedomosti.ru/rss/news', favicon: 'https://www.google.com/s2/favicons?domain=vedomosti.ru&sz=64' },
   { id: 'rt', name: 'RT на русском', url: 'https://russian.rt.com', rss: 'https://russian.rt.com/rss', favicon: 'https://www.google.com/s2/favicons?domain=russian.rt.com&sz=64' },
   { id: 'stopgame', name: 'Stopgame', url: 'https://stopgame.ru', rss: 'https://rss.stopgame.ru/rss_news.xml', favicon: 'https://www.google.com/s2/favicons?domain=stopgame.ru&sz=64' },
-  { id: 'nakedsci', name: 'Naked Science', url: 'https://naked-science.ru', rss: 'https://naked-science.ru/feed', favicon: 'https://www.google.com/s2/favicons?domain=naked-science.ru&sz=64' },
   { id: 'threednews', name: '3DNews', url: 'https://3dnews.ru', rss: 'https://3dnews.ru/news/rss/', favicon: 'https://www.google.com/s2/favicons?domain=3dnews.ru&sz=64' },
   { id: 'vcru', name: 'VC.ru', url: 'https://vc.ru', rss: 'https://vc.ru/rss/all', favicon: 'https://www.google.com/s2/favicons?domain=vc.ru&sz=64' },
   { id: 'naukatv', name: 'Наука.тв', url: 'https://naukatv.ru', rss: 'https://naukatv.ru/rss', favicon: 'https://www.google.com/s2/favicons?domain=naukatv.ru&sz=64' },
-  { id: 'elementy', name: 'Элементы.ру', url: 'https://elementy.ru', rss: 'https://elementy.ru/rss/news', favicon: 'https://www.google.com/s2/favicons?domain=elementy.ru&sz=64' },
+  { id: 'bbcru', name: 'BBC Russian', url: 'https://www.bbc.com/russian', rss: 'https://feeds.bbci.co.uk/russian/rss.xml', favicon: 'https://www.google.com/s2/favicons?domain=bbc.com&sz=64' },
+  { id: 'wired', name: 'Wired (EN→RU)', url: 'https://www.wired.com', rss: 'https://www.wired.com/feed/rss', favicon: 'https://www.google.com/s2/favicons?domain=wired.com&sz=64', needsTranslation: true },
+  { id: 'arstech', name: 'Ars Technica (EN→RU)', url: 'https://arstechnica.com', rss: 'https://feeds.arstechnica.com/arstechnica/index', favicon: 'https://www.google.com/s2/favicons?domain=arstechnica.com&sz=64', needsTranslation: true },
+  { id: 'engadget', name: 'Engadget (EN→RU)', url: 'https://www.engadget.com', rss: 'https://www.engadget.com/rss.xml', favicon: 'https://www.google.com/s2/favicons?domain=engadget.com&sz=64', needsTranslation: true },
+  { id: 'ign', name: 'IGN (EN→RU)', url: 'https://www.ign.com', rss: 'https://feeds.ign.com/ign/all', favicon: 'https://www.google.com/s2/favicons?domain=ign.com&sz=64', needsTranslation: true },
+  { id: 'eurogamer', name: 'Eurogamer (EN→RU)', url: 'https://www.eurogamer.net', rss: 'https://www.eurogamer.net/feed', favicon: 'https://www.google.com/s2/favicons?domain=eurogamer.net&sz=64', needsTranslation: true },
+  { id: 'bbcsport', name: 'BBC Sport (EN→RU)', url: 'https://www.bbc.com/sport', rss: 'https://feeds.bbci.co.uk/sport/rss.xml', favicon: 'https://www.google.com/s2/favicons?domain=bbc.com&sz=64', needsTranslation: true },
 ];
 
 const CATEGORIES = ['Все', 'Технологии', 'Бизнес', 'Наука', 'Спорт', 'ЧМ 2026', 'Культура', 'Мир', 'Общество', 'Происшествия', 'Игры'];
@@ -1825,31 +1828,44 @@ async function fetchRSS(source) {
         const el = item.querySelector(tag);
         return el ? (el.textContent || '').trim() : '';
       };
-      const title = stripHtml(getTag('title')) || 'Без заголовка';
+      const rawTitle = stripHtml(getTag('title')) || 'Без заголовка';
       const link = getTag('link') || item.getAttribute('rdf:about') || '';
       const pubDate = getTag('pubDate') || getTag('published') || getTag('dc\\:date') || getTag('date') || new Date().toUTCString();
       const date = new Date(pubDate);
       const iso = isNaN(date.getTime()) ? new Date().toISOString() : date.toISOString();
       const catRaw = getTag('category');
-      let category = mapCategory(catRaw);
       // For game-specific sources, force category to Игры
+      let category = mapCategory(catRaw);
       if (source.id === 'stopgame' && (category === 'Общество' || !catRaw)) category = 'Игры';
       // For science-specific sources, force category to Наука
-      if ((source.id === 'naukatv' || source.id === 'elementy') && (category === 'Общество' || !catRaw)) category = 'Наука';
-      // Smart keyword filter: ЧМ 2026 (overrides Спорт if football/ЧМ keywords in title)
-      const titleLower = title.toLowerCase();
-      if (/(чм[-\s]?2026|чемпионат мира 2026|мундиаль|мундиа[лль]|сборная.{0,20}(футбол|матч|игра)|футбол.{0,20}(чм|чемпионат мира|сборная))|чм[-\s]?по[-\s]?футболу/i.test(title)) {
+      if (source.id === 'naukatv' && (category === 'Общество' || !catRaw)) category = 'Наука';
+      // English sources → map categories
+      if (source.needsTranslation) {
+        const enCat = (catRaw || '').toLowerCase();
+        if (enCat.includes('gaming') || enCat.includes('game') || source.id === 'ign' || source.id === 'eurogamer') category = 'Игры';
+        else if (enCat.includes('sport') || enCat.includes('football') || enCat.includes('soccer') || source.id === 'bbcsport') category = 'Спорт';
+        else if (enCat.includes('tech') || enCat.includes('science') || source.id === 'arstech' || source.id === 'engadget' || source.id === 'wired') category = 'Технологии';
+        else if (enCat.includes('business') || enCat.includes('econom')) category = 'Бизнес';
+        else if (enCat.includes('world') || enCat.includes('politic')) category = 'Мир';
+        else category = 'Технологии';
+      }
+      // Smart keyword filter: ЧМ 2026
+      const titleLower = rawTitle.toLowerCase();
+      if (/(чм[-\s]?2026|чемпионат мира 2026|мундиаль|мундиа[лль]|сборная.{0,20}(футбол|матч|игра)|футбол.{0,20}(чм|чемпионат мира|сборная))|чм[-\s]?по[-\s]?футболу|world cup 2026|wc 2026|fifa/i.test(titleLower)) {
         category = 'ЧМ 2026';
       }
       const author = stripHtml(getTag('author') || getTag('dc\\:creator') || getTag('creator')) || source.name;
       const descRaw = getTag('description') || getTag('summary') || getTag('content\\:encoded') || '';
-      const content = stripHtml(descRaw);
-      // Fallback: if no description, use first 2 sentences of content
-      let excerpt = content.slice(0, 240);
-      if (!excerpt || excerpt.length < 30) {
-        const sentences = content.match(/[^.!?]+[.!?]+/g) || [];
-        excerpt = sentences.slice(0, 2).join(' ').slice(0, 240) || content.slice(0, 240);
+      const rawContent = stripHtml(descRaw);
+      let rawExcerpt = rawContent.slice(0, 240);
+      if (!rawExcerpt || rawExcerpt.length < 30) {
+        const sentences = rawContent.match(/[^.!?]+[.!?]+/g) || [];
+        rawExcerpt = sentences.slice(0, 2).join(' ').slice(0, 240) || rawContent.slice(0, 240);
       }
+      // For translated sources: use original title/excerpt, translation happens async in background
+      const title = rawTitle;
+      const content = rawContent;
+      const excerpt = rawExcerpt;
       // image extraction
       let image = '';
       const enc = item.querySelector('enclosure');
@@ -1871,11 +1887,13 @@ async function fetchRSS(source) {
         if (m) image = m[1];
       }
       return {
-        id: uid(source.id + '|' + link + '|' + title),
+        id: uid(source.id + '|' + link + '|' + rawTitle),
         title, excerpt, content, category, author,
+        _originalTitle: source.needsTranslation ? rawTitle : undefined,
+        _originalExcerpt: source.needsTranslation ? rawExcerpt : undefined,
         publishedAt: iso,
         readingTime: calcReadingTime(content || excerpt),
-        image: image || '', // empty = will show gradient placeholder with source favicon
+        image: image || '',
         link: link || source.url,
         source,
         views: Math.floor(Math.random() * 5000) + 200,
@@ -2734,6 +2752,71 @@ async function fetchMissingImages() {
   }
 }
 
+// ---------- AUTO TRANSLATION (EN→RU) ----------
+const TRANS_CACHE_KEY = 'momentum-trans-cache-v1';
+let transCache = {};
+try { transCache = JSON.parse(localStorage.getItem(TRANS_CACHE_KEY) || '{}'); } catch (e) {}
+function saveTransCache() {
+  const keys = Object.keys(transCache);
+  if (keys.length > 200) { keys.slice(0, keys.length - 200).forEach(k => delete transCache[k]); }
+  try { localStorage.setItem(TRANS_CACHE_KEY, JSON.stringify(transCache)); } catch (e) {}
+}
+
+// Translate title+excerpt for articles from sources with needsTranslation
+async function translateForeignArticles() {
+  // First apply cached translations
+  let updated = false;
+  for (const a of state.articles) {
+    if (a.source.needsTranslation && transCache[a.id]) {
+      const t = transCache[a.id];
+      if (t.title && a.title === a._originalTitle) { a.title = t.title; updated = true; }
+      if (t.excerpt && a.excerpt === a._originalExcerpt) { a.excerpt = t.excerpt; updated = true; }
+    }
+  }
+  if (updated) renderAll();
+
+  // Find articles needing translation (limit 10 per load)
+  const needTrans = state.articles.filter(a => a.source.needsTranslation && !transCache[a.id] && a._originalTitle).slice(0, 10);
+  if (needTrans.length === 0) return;
+
+  for (let i = 0; i < needTrans.length; i += 2) {
+    const batch = needTrans.slice(i, i + 2);
+    await Promise.allSettled(batch.map(a => translateArticle(a)));
+    renderAll();
+  }
+}
+
+async function translateArticle(article) {
+  if (transCache[article.id]) {
+    const t = transCache[article.id];
+    article.title = t.title;
+    article.excerpt = t.excerpt;
+    return;
+  }
+  try {
+    // Use Google Translate free API (client=gtx, no key needed)
+    const translateText = async (text) => {
+      const r = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ru&dt=t&q=${encodeURIComponent(text.slice(0, 500))}`, { signal: AbortSignal.timeout(6000) });
+      const j = await r.json();
+      // Google returns nested arrays: [[['translated','original',...],...],...]
+      return j[0].map(x => x[0]).join('');
+    };
+
+    const translatedTitle = await translateText(article._originalTitle);
+    let translatedExcerpt = article._originalExcerpt;
+    if (article._originalExcerpt && article._originalExcerpt.length > 10) {
+      translatedExcerpt = await translateText(article._originalExcerpt);
+    }
+
+    article.title = translatedTitle;
+    article.excerpt = translatedExcerpt;
+    transCache[article.id] = { title: translatedTitle, excerpt: translatedExcerpt };
+    saveTransCache();
+  } catch (e) {
+    // Keep original English text — better than nothing
+  }
+}
+
 async function fetchOgImage(article) {
   if (ogImgCache[article.id]) {
     article.image = ogImgCache[article.id];
@@ -3303,8 +3386,13 @@ async function loadAll(force) {
     document.getElementById('content').style.display = 'block';
     renderAll();
     // Background: fetch og:image for articles without photos (non-blocking)
-    if ('requestIdleCallback' in window) requestIdleCallback(() => fetchMissingImages());
-    else setTimeout(fetchMissingImages, 1000);
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(() => fetchMissingImages());
+      requestIdleCallback(() => translateForeignArticles());
+    } else {
+      setTimeout(fetchMissingImages, 1000);
+      setTimeout(translateForeignArticles, 2000);
+    }
   } catch (e) {
     console.error(e);
     document.getElementById('loading').style.display = 'none';
