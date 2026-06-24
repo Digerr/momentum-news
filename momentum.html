@@ -575,7 +575,7 @@ body.text-only-mode .card:not(.card-text) { border-top: 4px solid var(--cat-colo
 .geo-btn:hover { opacity: 0.7; }
 
 /* #32 Prefetch hint */
-article.card { contain: layout style; }
+article.card { contain: layout style; will-change: transform; }
 
 /* #4 Read-all mode toggle */
 body.read-all-mode #hero { display: none; }
@@ -1822,7 +1822,7 @@ async function fetchRSS(source) {
   if (!xml) { console.warn('RSS failed for', source.id, lastErr); return []; }
   try {
     const doc = new DOMParser().parseFromString(xml, 'text/xml');
-    const items = Array.from(doc.querySelectorAll('item, entry')).slice(0, 15);
+    const items = Array.from(doc.querySelectorAll('item, entry')).slice(0, 10);
     return items.map(item => {
       const getTag = (tag) => {
         const el = item.querySelector(tag);
@@ -2541,7 +2541,7 @@ function applyFilter() {
   if (featured) excludeIds.add(featured.id);
   secondary.forEach(a => excludeIds.add(a.id));
   state.filtered = pool.filter(a => !excludeIds.has(a.id));
-  state.visible = 9;
+  state.visible = 6;
 }
 
 function selectCategory(cat) {
@@ -2769,21 +2769,25 @@ async function translateForeignArticles() {
   for (const a of state.articles) {
     if (a.source.needsTranslation && transCache[a.id]) {
       const t = transCache[a.id];
-      if (t.title && a.title === a._originalTitle) { a.title = t.title; updated = true; }
-      if (t.excerpt && a.excerpt === a._originalExcerpt) { a.excerpt = t.excerpt; updated = true; }
+      if (t.title && a._originalTitle && a.title === a._originalTitle) { a.title = t.title; updated = true; }
+      if (t.excerpt && a._originalExcerpt && a.excerpt === a._originalExcerpt) { a.excerpt = t.excerpt; updated = true; }
     }
   }
   if (updated) renderAll();
 
-  // Find articles needing translation (limit 10 per load)
-  const needTrans = state.articles.filter(a => a.source.needsTranslation && !transCache[a.id] && a._originalTitle).slice(0, 10);
+  // Find articles needing translation (limit 15 per load)
+  const needTrans = state.articles.filter(a => a.source.needsTranslation && !transCache[a.id] && a._originalTitle).slice(0, 15);
   if (needTrans.length === 0) return;
 
-  for (let i = 0; i < needTrans.length; i += 2) {
-    const batch = needTrans.slice(i, i + 2);
-    await Promise.allSettled(batch.map(a => translateArticle(a)));
-    renderAll();
+  // Translate sequentially to avoid rate limiting
+  for (let i = 0; i < needTrans.length; i++) {
+    try {
+      await translateArticle(needTrans[i]);
+      // Re-render every 3 articles
+      if ((i + 1) % 3 === 0) renderAll();
+    } catch (e) {}
   }
+  renderAll();
 }
 
 async function translateArticle(article) {
@@ -3080,7 +3084,7 @@ function openArticle(id) {
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l1.5 4.5L18 8l-4.5 1.5L12 14l-1.5-4.5L6 8l4.5-1.5z"/></svg>
           AI
         </button>
-        <button class="translate-btn" id="modal-translate-btn" onclick="translateArticle()">
+        <button class="translate-btn" id="modal-translate-btn" onclick="translateModalArticle()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5h12M9 3v2c0 4.418-2.239 8-5 8M5 9c0 2.144 2.952 3.908 6.7 4M12 20l4-9 4 9M14.5 16h5"/></svg>
           EN
         </button>
@@ -3385,14 +3389,9 @@ async function loadAll(force) {
     document.getElementById('loading').style.display = 'none';
     document.getElementById('content').style.display = 'block';
     renderAll();
-    // Background: fetch og:image for articles without photos (non-blocking)
-    if ('requestIdleCallback' in window) {
-      requestIdleCallback(() => fetchMissingImages());
-      requestIdleCallback(() => translateForeignArticles());
-    } else {
-      setTimeout(fetchMissingImages, 1000);
-      setTimeout(translateForeignArticles, 2000);
-    }
+    // Background: fetch og:image and translate foreign articles
+    setTimeout(() => fetchMissingImages(), 1500);
+    setTimeout(() => translateForeignArticles(), 3000);
   } catch (e) {
     console.error(e);
     document.getElementById('loading').style.display = 'none';
@@ -3851,8 +3850,8 @@ async function generateDigest() {
   panel.innerHTML = html || '<p>Недостаточно данных для дайджеста</p>';
 }
 
-// #24 AI Translate
-async function translateArticle() {
+// #24 AI Translate (modal button)
+async function translateModalArticle() {
   const btn = document.querySelector('.translate-btn');
   if (btn) btn.classList.add('loading');
   const content = document.getElementById('modal-content');
@@ -4027,7 +4026,7 @@ function setupEvents() {
 
   // Load more (button click — fallback for infinite scroll)
   document.getElementById('load-more-btn').onclick = () => {
-    state.visible += 9;
+    state.visible += 6;
     renderGrid();
   };
 
@@ -4037,7 +4036,7 @@ function setupEvents() {
     const io = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting && state.visible < state.filtered.length) {
-          state.visible += 9;
+          state.visible += 6;
           renderGrid();
         }
       });
@@ -4448,7 +4447,7 @@ window.searchTag = searchTag;
 window.clearViewed = clearViewed;
 window.loadAll = loadAll;
 window.setModalFontSize = setModalFontSize;
-window.translateArticle = translateArticle;
+window.translateModalArticle = translateModalArticle;
 window.generateDigest = generateDigest;
 window.toggleReadAllMode = toggleReadAllMode;
 window.fetchWeatherByGeo = fetchWeatherByGeo;
